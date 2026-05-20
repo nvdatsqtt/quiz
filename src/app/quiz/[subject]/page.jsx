@@ -104,24 +104,8 @@ const Quiz = ({ params }) => {
   const percentage = Math.round((correctAnswers / questions.length) * 100);
   const averageTimePerQuestion = (totalTimeSpent / questions.length).toFixed(2);
 
-  // Phân tích cú pháp câu hỏi để hiển thị label "Câu x: " và Nhóm chuyên đề cùng dòng
-  const rawQuestionText = questions[currentQuestionIndex]?.question || "";
-  const regexWithGroup = /^([[^]]+])s*Câus*d+s*:s*(.+)$/i;
-  const regexNoGroup = /^Câus*d+s*:s*(.+)$/i;
-
-  let groupText = "";
-  let cleanQuestionText = rawQuestionText;
-
-  const matchGroup = rawQuestionText.match(regexWithGroup);
-  if (matchGroup) {
-    groupText = matchGroup[1]; // Ví dụ: [CÁC VĂN BẢN QUÁN TRIỆT]
-    cleanQuestionText = matchGroup[2]; // Phần câu hỏi thực tế sau dấu hai chấm
-  } else {
-    const matchNoGroup = rawQuestionText.match(regexNoGroup);
-    if (matchNoGroup) {
-      cleanQuestionText = matchNoGroup[1];
-    }
-  }
+  // Lấy nội dung câu hỏi sạch từ database (không chứa tiền tố Nhóm hay Câu x:)
+  const cleanQuestionText = questions[currentQuestionIndex]?.question || "";
 
   // Khai báo các nhãn tiền tố cho 4 phương án trắc nghiệm
   const optionPrefixes = ["A", "B", "C", "D"];
@@ -195,13 +179,7 @@ const Quiz = ({ params }) => {
           {/* Nội dung câu hỏi (Câu x in đậm màu đen, nhóm chuyên đề ở dòng trên, câu hỏi cùng dòng màu xanh navy) */}
           <div className="text-left p-5 sm:p-6 bg-slate-50 border border-slate-200 rounded-xl shadow-sm leading-relaxed mb-6">
             {/* Nhãn nhóm chuyên đề hiển thị nhỏ gọn ở dòng trên */}
-            {groupText && (
-              <div className="mb-3">
-                <span className="text-blue-700 bg-blue-50 border-blue-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider shadow-sm">
-                  {groupText}
-                </span>
-              </div>
-            )}
+
             
             <p className="text-lg sm:text-xl leading-relaxed flex flex-wrap items-baseline">
               {/* Số thứ tự câu hỏi màu đen đậm */}
