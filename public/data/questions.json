@@ -1,956 +1,1027 @@
 {
     "subjects": [
         {
-            "name": "Coding",
+            "name": "Kiểm tra chính trị 2026",
             "image": "/images/quiz.png",
             "questions": [
                 {
-                    "question": "What does HTML stand for?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 1: Một trong những điểm mới của Kết luận số 21 ngày 25/10/2021 của BCHTW khoá XIII “Về đẩy mạnh xây dựng, chỉnh đốn Đảng và hệ thống chính trị; kiên quyết ngăn chặn, đẩy lùi, xử lý nghiêm cán bộ, đảng viên suy thoái về tư tưởng chính trị, đạo đức, biểu hiện \"tự diễn biến\", \"tự chuyển hoá”?",
                     "options": [
-                        "Hypertext Markup Language",
-                        "Hightext Machine Language",
-                        "Hyperlink and Text Markup Language",
-                        "Hypertext Markup Link"
+                        "Mở rộng phạm vi, không chỉ xây dựng, chỉnh đốn Đảng trong sạch, vững mạnh mà còn bao gồm cả xây dựng hệ thống chính trị.",
+                        "Mở rộng quy mô xây dựng, chỉnh đốn Đảng; phòng ngừa trên diện rộng, trong đó tập trung cán bộ, đảng viên suy thoái về tư tưởng chính trị, đạo đức.",
+                        "Tập trung xây dựng chỉnh đốn Đảng, kiên quyết ngăn chặn, đẩy lùi, xử lý nghiêm cán bộ, đảng viên suy thoái về tư tưởng chính trị, đạo đức, lối sống.",
+                        "Tập trung xây dựng chỉnh đốn Đảng và cán bộ."
                     ],
-                    "answer": "Hypertext Markup Language"
+                    "answer": "Mở rộng phạm vi, không chỉ xây dựng, chỉnh đốn Đảng trong sạch, vững mạnh mà còn bao gồm cả xây dựng hệ thống chính trị."
                 },
                 {
-                    "question": "Which language is primarily used for web development?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 2: Trong Chiến lược phát triển hệ thống TTLLqs giai đoạn 2021-2030, tầm nhìn đến năm 2045 xác định mục tiêu xây dựng lực lượng thông tin liên lạc?",
                     "options": [
-                        "Python",
-                        "Java",
-                        "JavaScript",
-                        "C++"
+                        "Phấn đấu đến năm 2030 đạt trình độ hiện đại, đến năm 2045 ngang tầm các nước trên thế giới.",
+                        "Phấn đấu đến năm 2030 đạt trình độ ngang tầm khu vực, đến năm 2045 ngang tầm các nước trên thế giới.",
+                        "Phấn đấu đến năm 2030 đạt trình độ hiện đại, đến năm 2045 ngang tầm các nước trong khu vực.",
+                        "Phấn đấu đến năm 2030 đạt trình độ cao, đến năm 2045 ngang tầm các nước trên thế giới."
                     ],
-                    "answer": "JavaScript"
+                    "answer": "Phấn đấu đến năm 2030 đạt trình độ hiện đại, đến năm 2045 ngang tầm các nước trên thế giới."
                 },
                 {
-                    "question": "What is the purpose of CSS?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 3: Trong Chiến lược phát triển hệ thống TTLLqs giai đoạn 2021-2030, tầm nhìn đến năm 2045, Binh chủng xác định xây dựng đội ngũ nhân viên chuyên môn kỹ thuật từ năm 2021-2025 có trình độ đại học, cao đẳng đạt bao nhiêu % so với biểu tổ chức biên chế?",
                     "options": [
-                        "Structure the content",
-                        "Style the content",
-                        "Program the logic",
-                        "Create databases"
+                        "Đạt 83,8%.",
+                        "Đạt 88,3%.",
+                        "Đạt 85,8%.",
+                        "Đạt 88,5%."
                     ],
-                    "answer": "Style the content"
+                    "answer": "Đạt 88,3%."
                 },
                 {
-                    "question": "Which of the following is a backend programming language?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 4: Một trong những biểu hiện của chủ nghĩa cá nhân được nêu trong Nghị quyết số 847-NQ/QUTW ngày 28/12/2021 của Quân ủy Trung ương?",
                     "options": [
-                        "JavaScript",
-                        "HTML",
-                        "PHP",
-                        "CSS"
+                        "Thổi phồng thành tích, đánh bóng tên tuổi; có biểu hiện vu khống, bôi nhọ, chỉ trích, phê phán người khác với động cơ và mục đích không trong sáng.",
+                        "Sợ trách nhiệm; tranh công, đổ lỗi; thiếu ý thức và trách nhiệm với tập thể, không làm gương, không chấp hành sự phân công, điều động cán bộ.",
+                        "Giấu giếm, bao che và không trung thực về những khuyết điểm, sai phạm.",
+                        "Thổi phồng thành tích, đánh bóng tên tuổi; sợ trách nhiệm; tranh công, đổ lỗi; giấu giếm, bao che và không trung thực về những khuyết điểm, sai phạm."
                     ],
-                    "answer": "PHP"
+                    "answer": "Thổi phồng thành tích, đánh bóng tên tuổi; sợ trách nhiệm; tranh công, đổ lỗi; giấu giếm, bao che và không trung thực về những khuyết điểm, sai phạm."
                 },
                 {
-                    "question": "What is a variable?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 5: Đối tượng tác chiến của Quân đội ta hiện nay theo Nghị quyết Trung ương 8, khóa XI?",
                     "options": [
-                        "A constant value",
-                        "A storage location in memory",
-                        "A function",
-                        "A data type"
+                        "Những đối tượng sử dụng lực lượng để chống phá mục tiêu của cách mạng nước ta; tiến hành chiến tranh xâm lược; “diễn biến hòa bình”, bạo loạn lật đổ chế độ; xâm phạm độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ, lợi ích quốc gia, dân tộc của Việt Nam.",
+                        "Quân đội Mỹ và đồng minh sử dụng lực lượng để chống phá mục tiêu của cách mạng nước ta; tiến hành chiến tranh xâm lược; “diễn biến hòa bình”, bạo loạn lật đổ chế độ; xâm phạm độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ, lợi ích quốc gia, dân tộc của Việt Nam.",
+                        "Quân đội Mỹ và các thế lực thù địch sử dụng lực lượng để chống phá mục tiêu của cách mạng nước ta; tiến hành chiến tranh xâm lược; “diễn biến hòa bình”, bạo loạn lật đổ chế độ; xâm phạm độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ, lợi ích quốc gia, dân tộc của Việt Nam.",
+                        "Các thế lực thù địch gây chiến tranh xâm lược; “diễn biến hòa bình”, bạo loạn lật đổ chế độ; xâm phạm độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ, lợi ích quốc gia, dân tộc của Việt Nam dưới bất cứ hình thức nào."
                     ],
-                    "answer": "A storage location in memory"
+                    "answer": "Những đối tượng sử dụng lực lượng để chống phá mục tiêu của cách mạng nước ta; tiến hành chiến tranh xâm lược; “diễn biến hòa bình”, bạo loạn lật đổ chế độ; xâm phạm độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ, lợi ích quốc gia, dân tộc của Việt Nam."
                 },
                 {
-                    "question": "What does SQL stand for?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 6: Một trong 5 chuẩn mực phát huy phẩm chất Bộ đội Cụ Hồ thời kỳ mới được nêu trong Chỉ thị số 855-CT/QUTW ngày 12/8/2019 của Thường vụ Quân ủy Trung ương là gì?",
                     "options": [
-                        "Structured Query Language",
-                        "Sequential Query Language",
-                        "Simple Query Language",
-                        "Structured Quick Language"
+                        "Có tri thức khoa học, trình độ quân sự, năng lực, phương pháp, tác phong công tác và sức khỏe tốt đáp ứng yêu cầu nhiệm vụ.",
+                        "Có văn hóa, tri thức khoa học, trình độ quân sự, năng lực, phương pháp, tác phong công tác và sức khỏe tốt đáp ứng yêu cầu nhiệm vụ.",
+                        "Có văn hóa, trình độ, năng lực, phương pháp, tác phong công tác tốt.",
+                        "Có văn hóa, trình độ quân sự, năng lực, phương pháp, tác phong công tác đáp ứng yêu cầu nhiệm vụ."
                     ],
-                    "answer": "Structured Query Language"
+                    "answer": "Có văn hóa, tri thức khoa học, trình độ quân sự, năng lực, phương pháp, tác phong công tác và sức khỏe tốt đáp ứng yêu cầu nhiệm vụ."
                 },
                 {
-                    "question": "Which of the following is not a programming paradigm?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 7: Truyền thống của Quân đội nhân dân Việt Nam được Chủ tịch Hồ Chí Minh khen ngợi?",
                     "options": [
-                        "Object-oriented",
-                        "Procedural",
-                        "Functional",
-                        "Markup"
+                        "Quân đội ta sẵn sàng chiến đấu hy sinh, vì độc lập, tự do của Tổ quốc, vì chủ nghĩa xã hội. Nhiệm vụ nào cũng hoàn thành, khó khăn nào cũng vượt qua, kẻ thù nào cũng đánh thắng.",
+                        "Quân đội ta trung với Tổ quốc, hiếu với dân, sẵn sàng chiến đấu hy sinh, vì độc lập, tự do của Tổ quốc. Nhiệm vụ nào cũng hoàn thành, khó khăn nào cũng vượt qua, kẻ thù nào cũng đánh thắng.",
+                        "Quân đội ta trung với Đảng, hiếu với dân, sẵn sàng chiến đấu hy sinh, vì độc lập, tự do của Tổ quốc, vì chủ nghĩa xã hội. Nhiệm vụ nào cũng hoàn thành, khó khăn nào cũng vượt qua, kẻ thù nào cũng đánh thắng.",
+                        "Quân đội ta trung với sự nghiệp cách mạng, sẵn sàng chiến đấu hy sinh, vì chủ nghĩa xã hội. Nhiệm vụ nào cũng hoàn thành, khó khăn nào cũng vượt qua, kẻ thù nào cũng đánh thắng."
                     ],
-                    "answer": "Markup"
+                    "answer": "Quân đội ta trung với Đảng, hiếu với dân, sẵn sàng chiến đấu hy sinh, vì độc lập, tự do của Tổ quốc, vì chủ nghĩa xã hội. Nhiệm vụ nào cũng hoàn thành, khó khăn nào cũng vượt qua, kẻ thù nào cũng đánh thắng."
                 },
                 {
-                    "question": "What is the primary purpose of a loop?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 8: Một trong những đặc điểm chủ yếu trong phong cách tư duy của Hồ Chí Minh?",
                     "options": [
-                        "To repeat a block of code",
-                        "To define a variable",
-                        "To create a function",
-                        "To handle errors"
+                        "Luôn độc lập, tự chủ, sáng tạo; thống nhất giữa lý luận và thực tiễn.",
+                        "Luôn độc lập, tự chủ, sáng tạo; thống nhất giữa lý luận và thực tiễn; có sự kế thừa và phát triển, cụ thể và thiết thực; kiên định và linh hoạt.",
+                        "Luôn độc lập, tự chủ, sáng tạo; thống nhất giữa lý luận và thực tiễn; có sự kế thừa và phát triển, cụ thể và thiết thực.",
+                        "Luôn độc lập, sáng tạo; thống nhất giữa lý luận và thực tiễn; có sự kế thừa và phát triển, cụ thể và thiết thực."
                     ],
-                    "answer": "To repeat a block of code"
+                    "answer": "Luôn độc lập, tự chủ, sáng tạo; thống nhất giữa lý luận và thực tiễn; có sự kế thừa và phát triển, cụ thể và thiết thực; kiên định và linh hoạt."
                 },
                 {
-                    "question": "What is an API?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 9: Một trong các hành vi bị nghiêm cấm tại Điều 5, Thông tư số 56/2020/TT-BQP, ngày 05/5/2020 của BQP được quy định như thế nào?",
                     "options": [
-                        "Application Programming Interface",
-                        "Advanced Programming Interface",
-                        "Application Program Interface",
-                        "Advanced Program Interface"
+                        "Sử dụng vật mang tin điện tử có giải pháp bảo đảm an toàn thông tin an ninh mạng để trao đổi thông tin, dữ liệu giữa máy tính quân sự với máy tính Internet.",
+                        "Sử dụng vật mang tin điện tử không có giải pháp bảo đảm an toàn thông tin an ninh mạng để trao đổi thông tin, dữ liệu giữa máy tính quân sự với máy tính Internet.",
+                        "Trao đổi thông tin mật trên mạng có các giải pháp bảo mật cơ yếu.",
+                        "Có các giải pháp bảo đảm an toàn trong sử dụng vật mang tin."
                     ],
-                    "answer": "Application Programming Interface"
+                    "answer": "Sử dụng vật mang tin điện tử không có giải pháp bảo đảm an toàn thông tin an ninh mạng để trao đổi thông tin, dữ liệu giữa máy tính quân sự với máy tính Internet."
                 },
                 {
-                    "question": "Which data structure uses LIFO (Last In, First Out)?",
+                    "question": "[CÁC VĂN BẢN QUÁN TRIỆT] Câu 10: Một trong những nội dung về chống lộ lọt thông tin trên mạng Internet được xác định trong Điều 26, Thông tư số 56/2020/TT-BQP, ngày 05/5/2020 của BQP như thế nào?",
                     "options": [
-                        "Queue",
-                        "Stack",
-                        "Array",
-                        "Linked List"
+                        "Tên, tài khoản truy nhập của máy tính Internet hoặc tài khoản sử dụng trên mạng Internet phải có mật khẩu và được sử dụng thông tin cá nhân gắn với nhiệm vụ và cấp bậc, chức vụ, vị trí công tác, phiên hiệu đơn vị.",
+                        "Tên, tài khoản truy nhập của máy tính Internet hoặc tài khoản sử dụng trên mạng Internet không cần phải có mật khẩu để bảo vệ và được sử dụng thông tin cá nhân gắn với cấp bậc, chức vụ, vị trí công tác, phiên hiệu đơn vị.",
+                        "Tên, tài khoản truy nhập của máy tính Internet hoặc tài khoản sử dụng trên mạng Internet nên có mật khẩu phức tạp để bảo vệ và có thể sử dụng thông tin cá nhân gắn với cấp bậc, chức vụ, vị trí công tác, phiên hiệu đơn vị.",
+                        "Tên, tài khoản truy nhập của máy tính Internet hoặc tài khoản sử dụng trên mạng Internet phải có mật khẩu phức tạp để bảo vệ và không sử dụng thông tin cá nhân gắn với cấp bậc, chức vụ, vị trí công tác, phiên hiệu đơn vị."
                     ],
-                    "answer": "Stack"
-                }
-            ]
-        },
-        {
-            "name": "Math",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Tên, tài khoản truy nhập của máy tính Internet hoặc tài khoản sử dụng trên mạng Internet phải có mật khẩu phức tạp để bảo vệ và không sử dụng thông tin cá nhân gắn với cấp bậc, chức vụ, vị trí công tác, phiên hiệu đơn vị."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 11: Chủ thể lãnh đạo, chỉ đạo, tiến hành công tác quản lý tư tưởng; nắm và định hướng dư luận trong Quân đội là?",
+                    "options": [
+                        "Cấp ủy, tổ chức đảng, chính ủy, chính trị viên (bí thư), cơ quan chính trị, cán bộ chính trị các cấp.",
+                        "Cấp ủy, tổ chức đảng, chính ủy, chính trị viên (bí thư), cán bộ chính trị các cấp.",
+                        "Cấp ủy, tổ chức đảng, chính ủy, chính trị viên (bí thư), người chỉ huy, cơ quan chính trị, cán bộ chính trị các cấp.",
+                        "Cấp ủy, tổ chức đảng, chính ủy, chính trị viên (bí thư)."
+                    ],
+                    "answer": "Cấp ủy, tổ chức đảng, chính ủy, chính trị viên (bí thư), người chỉ huy, cơ quan chính trị, cán bộ chính trị các cấp."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 12: Một trong những nguyên tắc tiến hành công tác quản lý tư tưởng quân nhân; nắm và định hướng dư luận trong Quân đội là?",
+                    "options": [
+                        "Kết hợp giữa “xây” và “chống”, chủ động phòng ngừa, đấu tranh với những biểu hiện suy thoái về tư tưởng chính trị, đạo đức, lối sống, “tự diễn biến”, “tự chuyển hóa”.",
+                        "Kết hợp giữa “xây” và “chống”, lấy xây dựng, phát huy mặt tích cực, tiến bộ của quân nhân và cơ quan, đơn vị là chính để khắc phục mặt tiêu cực, lạc hậu; chủ động phòng ngừa, đấu tranh với những biểu hiện suy thoái về tư tưởng chính trị, đạo đức, lối sống, “tự diễn biến”, “tự chuyển hóa”, coi trọng phát huy dân chủ, chống rập khuôn, máy móc.",
+                        "Kết hợp giữa “xây” và “chống”, lấy xây dựng, phát huy mặt tích cực, tiến bộ của quân nhân và cơ quan, đơn vị là chính để khắc phục mặt tiêu cực, lạc hậu.",
+                        "Kết hợp giữa “xây” và “chống”, lấy xây dựng, phát huy mặt tích cực, tiến bộ của quân nhân và cơ quan, đơn vị là chính để khắc phục mặt tiêu cực, lạc hậu; chủ động phòng ngừa, đấu tranh với những biểu hiện suy thoái về tư tưởng chính trị, đạo đức, lối sống, “tự diễn biến”, “tự chuyển hóa”."
+                    ],
+                    "answer": "Kết hợp giữa “xây” và “chống”, lấy xây dựng, phát huy mặt tích cực, tiến bộ của quân nhân và cơ quan, đơn vị là chính để khắc phục mặt tiêu cực, lạc hậu; chủ động phòng ngừa, đấu tranh với những biểu hiện suy thoái về tư tưởng chính trị, đạo đức, lối sống, “tự diễn biến”, “tự chuyển hóa”."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 13: Phương pháp nắm tư tưởng quân nhân bao gồm?",
+                    "options": [
+                        "Phương pháp trực tiếp.",
+                        "Phương pháp gián tiếp.",
+                        "Phương pháp trực tiếp, phương pháp gián tiếp và phương pháp vu hồi.",
+                        "Phương pháp trực tiếp và phương pháp gián tiếp."
+                    ],
+                    "answer": "Phương pháp trực tiếp và phương pháp gián tiếp."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 14: Các mức phân loại tư tưởng quân nhân bao gồm?",
+                    "options": [
+                        "Tốt, khá, trung bình, yếu.",
+                        "Tốt, khá, trung bình, yếu, kém.",
+                        "Tốt, khá, trung bình.",
+                        "Tốt, khá."
+                    ],
+                    "answer": "Tốt, khá, trung bình, yếu."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 15: Phân cấp quản lý tư tưởng quân nhân đối với cấp Đại đội và tương đương?",
+                    "options": [
+                        "Quản lý đến cấp cán bộ trung đội (tương đương).",
+                        "Quản lý tư tưởng mọi quân nhân thuộc quyền.",
+                        "Quản lý đến cấp cán bộ tiểu đội (tương đương) trở lên.",
+                        "Quản lý những chiến sĩ có thành tích xuất sắc, năng lực tốt, có khó khăn đột xuất hoặc quân nhân cá biệt."
+                    ],
+                    "answer": "Quản lý tư tưởng mọi quân nhân thuộc quyền."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 16: Biện pháp giải quyết đối với những tư tưởng tiêu cực là?",
+                    "options": [
+                        "Nắm chắc bản chất, chủ động giáo dục (giáo dục chung, giáo dục riêng).",
+                        "Nắm chắc bản chất, chủ động giáo dục (giáo dục chung, giáo dục riêng), có biện pháp ngăn chặn, không để các biểu hiện tư tưởng tiêu cực xảy ra và lan rộng trong đơn vị.",
+                        "Nắm chắc bản chất, chủ động giáo dục (giáo dục chung, giáo dục riêng), có biện pháp ngăn chặn, không để các biểu hiện tư tưởng tiêu cực xảy ra và lan rộng trong đơn vị. Tăng cường lao động thêm vào ngày nghỉ.",
+                        "Nắm chắc bản chất, có biện pháp ngăn chặn, không để các biểu hiện tư tưởng tiêu cực xảy ra và lan rộng trong đơn vị."
+                    ],
+                    "answer": "Nắm chắc bản chất, chủ động giáo dục (giáo dục chung, giáo dục riêng), có biện pháp ngăn chặn, không để các biểu hiện tư tưởng tiêu cực xảy ra và lan rộng trong đơn vị."
+                },
+                {
+                    "question": "[Quy chế 775 về quản lý tư tưởng] Câu 17: Một trong những nội dung bồi dưỡng khát vọng cống hiến cho quân nhân:",
+                    "options": [
+                        "Bồi dưỡng mục tiêu, lý tưởng chiến đấu của Đảng, chức năng, nhiệm vụ của Quân đội cho quân nhân nhằm xây dựng bản lĩnh chính trị, ý chí quyết tâm, khả năng vượt qua mọi khó khăn trong thực hiện chức trách, nhiệm vụ được giao và cuộc sống thường ngày",
+                        "Bồi dưỡng mục tiêu, lý tưởng chiến đấu của Đảng, xây dựng bản lĩnh chính trị, ý chí quyết tâm, khả năng vượt qua mọi khó khăn trong thực hiện chức trách, nhiệm vụ được giao và cuộc sống thường ngày",
+                        "Bồi dưỡng ý thức trách nhiệm, tinh thần yêu nước của dân tộc, Quân đội, tích cực đóng góp sức mình vào sự nghiệp xây dựng Quân đội, củng cố quốc phòng"
+                    ],
+                    "answer": "Bồi dưỡng mục tiêu, lý tưởng chiến đấu của Đảng, chức năng, nhiệm vụ của Quân đội cho quân nhân nhằm xây dựng bản lĩnh chính trị, ý chí quyết tâm, khả năng vượt qua mọi khó khăn trong thực hiện chức trách, nhiệm vụ được giao và cuộc sống thường ngày"
+                },
+                {
+                    "question": "[CHỈ THỈ SỐ 05] Câu 18: Phương châm triển khai thực hiện Chỉ thị số 05 của Bộ Chính trị về “Đẩy mạnh học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh”?",
+                    "options": [
+                        "Trên trước, dưới sau; trong trước, ngoài sau; học đi đôi với làm theo, chú trọng việc làm theo bằng những hành động và việc làm cụ thể.",
+                        "Từ cán bộ đến quần chúng, chú trọng nói đi đôi với làm, cần kiệm, liêm chính, chí công vô tư, việc làm theo bằng những hành động và việc làm cụ thể.",
+                        "Từ đảng viên đến quần chúng, chú trọng việc làm theo bằng những hành động và việc làm cụ thể.",
+                        "Từ tập thể đến cá nhân, chú trọng xây dựng điển hình tiên tiến, học tập làm theo bằng những hành động và việc làm cụ thể."
+                    ],
+                    "answer": "Trên trước, dưới sau; trong trước, ngoài sau; học đi đôi với làm theo, chú trọng việc làm theo bằng những hành động và việc làm cụ thể."
+                },
+                {
+                    "question": "[CHỈ THỈ SỐ 05] Câu 19: Qua học tập và nghiên cứu Chỉ thị số 05, việc học tập và làm theo Bác trong xã hội cần được thực hiện với phương châm gì?",
+                    "options": [
+                        "Ưu tiên hình thức truyền thông, giảm tải thực hành.",
+                        "Sát chức năng, nhiệm vụ, ngắn gọn, dễ nhớ, dễ thực hiện và dễ đánh giá hiệu quả.",
+                        "Tự do vận dụng theo cách hiểu của từng đơn vị.",
+                        "Dựa vào các phong trào thi đua toàn quốc là chủ yếu."
+                    ],
+                    "answer": "Sát chức năng, nhiệm vụ, ngắn gọn, dễ nhớ, dễ thực hiện và dễ đánh giá hiệu quả."
+                },
+                {
+                    "question": "[CHỈ THỈ SỐ 05] Câu 20: Qua học tập và nghiên cứu Chỉ thị số 05, đối với công tác kiểm tra, đánh giá cán bộ cần có yêu cầu gì?",
+                    "options": [
+                        "Tập trung vào kết quả chuyên môn, nghiệp vụ.",
+                        "Gắn với việc học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh, bao gồm đánh giá hằng năm và toàn nhiệm kỳ.",
+                        "Chỉ dựa vào ý kiến nhận xét của quần chúng nhân dân.",
+                        "Giao quyền cho lãnh đạo cơ quan quyết định mà không cần tiêu chí cụ thể."
+                    ],
+                    "answer": "Gắn với việc học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh, bao gồm đánh giá hằng năm và toàn nhiệm kỳ."
+                },
+                {
+                    "question": "[CHỈ THỈ SỐ 05] Câu 21: Qua học tập và nghiên cứu Chỉ thị số 05, phong cách sống của Hồ Chí Minh có ảnh hưởng như thế nào đối với xã hội hiện đại?",
+                    "options": [
+                        "Là tấm gương về sự giản dị, trong sạch, tiết kiệm và vì dân vì nước.",
+                        "Là hình ảnh minh họa mang tính biểu tượng lịch sử, phát huy truyền thống.",
+                        "Là mô hình quản lý kiểu mẫu của thời kỳ bao cấp.",
+                        "Là nét truyền thống phù hợp với xã hội thời phong kiến."
+                    ],
+                    "answer": "Là tấm gương về sự giản dị, trong sạch, tiết kiệm và vì dân vì nước."
+                },
+                {
+                    "question": "[CHỈ THỈ SỐ 05] Câu 22: Qua học tập và nghiên cứu Chỉ thị số 05, việc tuyên truyền về học tập và làm theo tư tưởng Hồ Chí Minh được yêu cầu thực hiện ra sao?",
+                    "options": [
+                        "Tổ chức một lần vào mỗi dịp sinh nhật Bác. Các dịp lễ lớn của các sự kiện trong nước.",
+                        "Được triển khai một cách liên tục, sinh động, có hệ thống và phù hợp với từng đối tượng.",
+                        "Duy trì qua việc đăng khẩu hiệu tại trụ sở cơ quan, đơn vị.",
+                        "Chỉ thông qua báo chí chính thống và văn bản của Đảng."
+                    ],
+                    "answer": "Được triển khai một cách liên tục, sinh động, có hệ thống và phù hợp với từng đối tượng."
+                },
                 {
-                    "question": "What is the square root of 49?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 23: Chỉ thị số 05 đưa ra định hướng gì trong công tác giáo dục tư tưởng Hồ Chí Minh?",
                     "options": [
-                        "7",
-                        "12",
-                        "49",
-                        "6"
+                        "Giới hạn ở các chương trình bồi dưỡng ngắn hạn cho cán bộ quản lý, cán bộ lãnh đạo.",
+                        "Lồng ghép phù hợp với từng cấp học, từ phổ thông đến đại học và các trường chính trị.",
+                        "Tập trung vào các trường đào tạo chuyên ngành quân sự \\- an ninh.",
+                        "Chỉ cần học một lần tại lớp cảm tình Đảng."
                     ],
-                    "answer": "7"
+                    "answer": "Lồng ghép phù hợp với từng cấp học, từ phổ thông đến đại học và các trường chính trị."
                 },
                 {
-                    "question": "What is 2 + 2?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 24: Qua học tập và nghiên cứu Chỉ thị số 05, những giá trị tư tưởng Hồ Chí Minh cần được thể hiện thế nào trong đời sống xã hội?",
                     "options": [
-                        "3",
-                        "4",
-                        "5",
-                        "6"
+                        "Trở thành động lực tinh thần cho các phong trào văn nghệ, thể thao.",
+                        "Được thấm sâu vào nền tảng văn hóa, đời sống xã hội, góp phần xây dựng con người Việt Nam hiện đại và nhân văn.",
+                        "Chỉ tồn tại trong các khẩu hiệu tuyên truyền hoặc văn bản chính trị.",
+                        "Chỉ áp dụng với cán bộ đảng viên và đoàn viên thanh niên."
                     ],
-                    "answer": "4"
+                    "answer": "Được thấm sâu vào nền tảng văn hóa, đời sống xã hội, góp phần xây dựng con người Việt Nam hiện đại và nhân văn."
                 },
                 {
-                    "question": "What is the square root of 16?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 25: Vì sao Chỉ thị số 05 yêu cầu gắn học tập và làm theo Bác với nhiệm vụ chính trị?",
                     "options": [
-                        "2",
-                        "4",
-                        "8",
-                        "16"
+                        "Để giảm tải khối lượng công việc chuyên môn trong từng cơ quan.",
+                        "Để tránh tình trạng học hình thức, tách rời thực tiễn.",
+                        "Để tổ chức các buổi học tập mang tính giải trí, thư giãn.",
+                        "Để thúc đẩy công tác khen thưởng, kỷ luật nội bộ."
                     ],
-                    "answer": "4"
+                    "answer": "Để tránh tình trạng học hình thức, tách rời thực tiễn."
                 },
                 {
-                    "question": "What is 7 x 6?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 26: Phong cách Hồ Chí Minh có giá trị như thế nào trong quá trình xây dựng đội ngũ cán bộ?",
                     "options": [
-                        "42",
-                        "36",
-                        "48",
-                        "56"
+                        "Giúp cán bộ thực hiện đúng quy trình hành chính hiện đại.",
+                        "Là cơ sở hình thành phong cách lãnh đạo gần dân, giản dị, khoa học, dân chủ và gương mẫu.",
+                        "Là tài liệu nghiên cứu phục vụ việc viết tiểu luận cá nhân.",
+                        "Chỉ phù hợp với cán bộ cấp cao trong hệ thống chính trị."
                     ],
-                    "answer": "42"
+                    "answer": "Là cơ sở hình thành phong cách lãnh đạo gần dân, giản dị, khoa học, dân chủ và gương mẫu."
                 },
                 {
-                    "question": "What is 15 - 9?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 27: Theo Chỉ thị số 05, một trong những yêu cầu đặt ra là gì đối với cán bộ, đảng viên?",
                     "options": [
-                        "6",
-                        "7",
-                        "8",
-                        "5"
+                        "Phải học tập, làm theo Bác với tinh thần tự nguyện, không bắt buộc.",
+                        "Phải thường xuyên tu dưỡng đạo đức, lối sống, nêu gương trong sinh hoạt, công tác.",
+                        "Chỉ cần tham gia các đợt học tập chính trị cuối năm.",
+                        "Ưu tiên học tập lý thuyết, chưa cần hành động cụ thể."
                     ],
-                    "answer": "6"
+                    "answer": "Phải thường xuyên tu dưỡng đạo đức, lối sống, nêu gương trong sinh hoạt, công tác."
                 },
                 {
-                    "question": "What is 5^2?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 28: Đối với hệ thống giáo dục quốc dân, Chỉ thị số 05 yêu cầu việc đưa tư tưởng, đạo đức, phong cách Hồ Chí Minh vào giảng dạy như thế nào?",
                     "options": [
-                        "25",
-                        "20",
-                        "15",
-                        "30"
+                        "Được tích hợp như một phần của môn lịch sử hiện đại Việt Nam.",
+                        "Được tổ chức dưới hình thức các hoạt động ngoại khóa, tùy vào điều kiện từng trường.",
+                        "Được biên soạn thành chương trình, giáo trình phù hợp với từng cấp học, bậc học, bảo đảm tính hệ thống và hiệu quả giáo dục.",
+                        "Chỉ áp dụng cho các trường chính trị và lực lượng vũ trang."
                     ],
-                    "answer": "25"
+                    "answer": "Được biên soạn thành chương trình, giáo trình phù hợp với từng cấp học, bậc học, bảo đảm tính hệ thống và hiệu quả giáo dục."
                 },
                 {
-                    "question": "What is the value of π (pi) to two decimal places?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 29: Chỉ thị số 05 nêu rõ phong cách Hồ Chí Minh có ý nghĩa như thế nào đối với cán bộ, đảng viên trong giai đoạn hiện nay?",
                     "options": [
-                        "3.14",
-                        "3.16",
-                        "3.12",
-                        "3.15"
+                        "Là hình mẫu của một nhà chính trị \\- quân sự tài ba cần học hỏi.",
+                        "Là một bộ phận trong chương trình giáo dục đạo đức cho học sinh.",
+                        "Là tấm gương về tư duy độc lập, phong cách sống giản dị, nói đi đôi với làm, gần dân, vì dân, cần được vận dụng sâu sắc vào công việc và lối sống hằng ngày.",
+                        "Là chuẩn mực đạo đức mang tính truyền thống được truyền miệng qua các thế hệ."
                     ],
-                    "answer": "3.14"
+                    "answer": "Là tấm gương về tư duy độc lập, phong cách sống giản dị, nói đi đôi với làm, gần dân, vì dân, cần được vận dụng sâu sắc vào công việc và lối sống hằng ngày."
                 },
                 {
-                    "question": "What is the next prime number after 7?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 30: Chỉ thị số 05 đề cao vai trò của người đứng đầu cấp ủy, cơ quan, đơn vị như thế nào trong việc triển khai học tập và làm theo Bác?",
                     "options": [
-                        "8",
-                        "9",
-                        "10",
-                        "11"
+                        "Là người trực tiếp ra quyết định xử lý các vi phạm đạo đức.",
+                        "Là người chịu trách nhiệm lập kế hoạch đào tạo lý luận chính trị cho cán bộ.",
+                        "Là người tiên phong, nêu gương bằng hành động cụ thể trong học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh.",
+                        "Là người quản lý ngân sách cho các hoạt động học tập và tuyên truyền."
                     ],
-                    "answer": "11"
+                    "answer": "Là người tiên phong, nêu gương bằng hành động cụ thể trong học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh."
                 },
                 {
-                    "question": "What is the sum of angles in a triangle?",
+                    "question": "[CHỈ THỈ SỐ 05] Câu 31: Phong cách nào của Chủ tịch Hồ Chí Minh được đề cập trong Chỉ thị số 05?",
                     "options": [
-                        "90 degrees",
-                        "180 degrees",
-                        "360 degrees",
-                        "270 degrees"
+                        "Phong cách làm việc độc đoán, quyết đoán.",
+                        "Phong cách thiếu tư duy độc lập và thực tiễn.",
+                        "Phong cách sống xa hoa, hiện đại.",
+                        "Phong cách nói đi đôi với làm."
                     ],
-                    "answer": "180 degrees"
+                    "answer": "Phong cách nói đi đôi với làm."
                 },
                 {
-                    "question": "What is 12 ÷ 4?",
+                    "question": "[NQ 3488] Câu 32: Một yêu cầu về thể chế theo Nghị quyết số 3488-NQ/QUTW của Quân uỷ Trung ương là:",
                     "options": [
-                        "3",
-                        "4",
-                        "2",
-                        "6"
+                        "Mở rộng hợp tác với doanh nghiệp nước ngoài",
+                        "Xây dựng hành lang pháp lý cho đổi mới sáng tạo",
+                        "Tăng thuế doanh nghiệp",
+                        "Cắt giảm đầu tư công"
                     ],
-                    "answer": "3"
-                }
-            ]
-        },
-        {
-            "name": "Science",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Xây dựng hành lang pháp lý cho đổi mới sáng tạo"
+                },
                 {
-                    "question": "What is the chemical symbol for water?",
+                    "question": "[NQ 3488] Câu 33: Một trong các giải pháp về tài chính trong Nghị quyết số 3488-NQ/QUTW của Quân uỷ Trung ương là:",
                     "options": [
-                        "H2O",
-                        "O2",
-                        "CO2",
-                        "N2"
+                        "Xã hội hóa đầu tư cho khoa học công nghệ",
+                        "Cắt giảm lương cán bộ",
+                        "Hạn chế ngân sách quốc phòng",
+                        "Tăng thuế thu nhập cá nhân"
                     ],
-                    "answer": "H2O"
+                    "answer": "Xã hội hóa đầu tư cho khoa học công nghệ"
                 },
                 {
-                    "question": "Which planet is known as the Red Planet?",
+                    "question": "[NQ 3488] Câu 34: Nghị quyết số 3488-NQ/QUTW của Quân uỷ Trung ương nhấn mạnh vai trò của cán bộ, đảng viên như thế nào trong chuyển đổi số?",
                     "options": [
-                        "Earth",
-                        "Mars",
-                        "Jupiter",
-                        "Saturn"
+                        "Chỉ tham gia đào tạo cơ bản",
+                        "Là lực lượng chủ công trong nhận thức và thực hiện",
+                        "Chỉ cần hỗ trợ về tinh thần",
+                        "Không bắt buộc tham gia vào quá trình chuyển đổi"
                     ],
-                    "answer": "Mars"
+                    "answer": "Là lực lượng chủ công trong nhận thức và thực hiện"
                 },
                 {
-                    "question": "What is the speed of light?",
+                    "question": "[NQ 3488] Câu 35: Nghị quyết số 3488-NQ/QUTW của Quân uỷ Trung ương xác định chuyển đổi số trong lĩnh vực đào tạo cần ưu tiên nội dung gì?",
                     "options": [
-                        "299,792 km/s",
-                        "150,000 km/s",
-                        "1,000 km/s",
-                        "300,000 km/s"
+                        "Xây dựng phòng học tiêu chuẩn quân sự",
+                        "Triển khai hệ thống học liệu số, học trực tuyến",
+                        "Tăng cường luyện tập thể lực",
+                        "Chỉ sử dụng giáo trình giấy truyền thống"
                     ],
-                    "answer": "299,792 km/s"
+                    "answer": "Triển khai hệ thống học liệu số, học trực tuyến"
                 },
                 {
-                    "question": "What is the powerhouse of the cell?",
+                    "question": "[NQ 3488] Câu 36: Nghị quyết số 3488-NQ/QUTW của Quân uỷ Trung ương yêu cầu tạo điều kiện gì để thu hút nhân lực chất lượng cao?",
                     "options": [
-                        "Nucleus",
-                        "Ribosome",
-                        "Mitochondria",
-                        "Endoplasmic Reticulum"
+                        "Cho thuê nhà, mặt bằng, thiết bị và dịch vụ giá rẻ",
+                        "Môi trường làm việc năng động, chế độ đãi ngộ xứng đáng",
+                        "Hạn chế cạnh tranh trong công việc, cắt giảm nhân lực và kinh phí",
+                        "Không cần thiết vì đã có nhân sự"
                     ],
-                    "answer": "Mitochondria"
+                    "answer": "Môi trường làm việc năng động, chế độ đãi ngộ xứng đáng"
                 },
                 {
-                    "question": "What gas do plants absorb?",
+                    "question": "[NQ 3488] Câu 37: Nghị quyết số 3488-NQ/QUTW của Quân uỷ Trung ương yêu cầu xây dựng môi trường nào để khuyến khích nghiên cứu và sáng tạo?",
                     "options": [
-                        "Oxygen",
-                        "Carbon Dioxide",
-                        "Nitrogen",
-                        "Hydrogen"
+                        "Môi trường cạnh tranh cao giữa các địa phương",
+                        "Môi trường học thuật cổ truyền",
+                        "Môi trường mở, linh hoạt, ít rào cản",
+                        "Môi trường bí mật, không công khai thông tin"
                     ],
-                    "answer": "Carbon Dioxide"
+                    "answer": "Môi trường mở, linh hoạt, ít rào cản"
                 },
                 {
-                    "question": "What is the boiling point of water?",
+                    "question": "[NQ 3488] Câu 39: “7 dám” theo tinh thần của cố Tổng Bí thư Nguyễn Phú Trọng có vai trò gì?",
                     "options": [
-                        "100°C",
-                        "90°C",
-                        "80°C",
-                        "120°C"
+                        "Là tiêu chí đánh giá phẩm chất đạo đức lối sống của sĩ quan trẻ trong đời sống hằng ngày.",
+                        "Là khẩu hiệu trong công tác thi đua khen thưởng cho cán bộ sĩ quan trong Quân đội.",
+                        "Là tư tưởng chỉ đạo bồi dưỡng cán bộ, khuyến khích bản lĩnh, sáng tạo, hành động vì tập thể.",
+                        "Là nội dung chính trong chương trình học của các trường đào tạo sĩ quan hiện nay."
                     ],
-                    "answer": "100°C"
+                    "answer": "Là tư tưởng chỉ đạo bồi dưỡng cán bộ, khuyến khích bản lĩnh, sáng tạo, hành động vì tập thể."
                 },
                 {
-                    "question": "What is the chemical symbol for gold?",
+                    "question": "[VĂN KIỆN ĐH XIV] Câu 40: Đại hội XIV của Đảng xác định mục tiêu chiến lược đến năm 2045 là gì?",
                     "options": [
-                        "Au",
-                        "Ag",
-                        "Pb",
-                        "Fe"
+                        "Trở thành nước đang phát triển có công nghiệp hiện đại, thu nhập trung bình cao.",
+                        "Trở thành nước phát triển, có thu nhập cao, theo định hướng xã hội chủ nghĩa.",
+                        "Hoàn thành cơ bản công nghiệp hóa, hiện đại hóa đất nước.",
+                        "Đạt mức thu nhập trung bình cao và có chỉ số phát triển con người (HDI) cao."
                     ],
-                    "answer": "Au"
+                    "answer": "Trở thành nước phát triển, có thu nhập cao, theo định hướng xã hội chủ nghĩa."
                 },
                 {
-                    "question": "Which planet is closest to the Sun?",
+                    "question": "[VĂN KIỆN ĐH XIV] Câu 41: Phương châm hành động của Đại hội XIV được xác lập là gì?",
                     "options": [
-                        "Venus",
-                        "Mars",
-                        "Mercury",
-                        "Earth"
+                        "Đoàn kết \\- Dân chủ \\- Kỷ cương \\- Đột phá \\- Phát triển.",
+                        "Đoàn kết \\- Sáng tạo \\- Kỷ cương \\- Phát triển.",
+                        "Đoàn kết \\- Dân chủ \\- Đổi mới \\- Phát triển.",
+                        "Đoàn kết \\- Kỷ cương \\- Hành động \\- Hiệu quả."
                     ],
-                    "answer": "Mercury"
+                    "answer": "Đoàn kết \\- Dân chủ \\- Kỷ cương \\- Đột phá \\- Phát triển."
                 },
                 {
-                    "question": "What is the most abundant gas in the Earth's atmosphere?",
+                    "question": "[VĂN KIỆN ĐH XIV] Câu 42: Động lực chính của mô hình tăng trưởng mới trong nhiệm kỳ Đại hội XIV là gì?",
                     "options": [
-                        "Oxygen",
-                        "Nitrogen",
-                        "Carbon Dioxide",
-                        "Hydrogen"
+                        "Khai thác tài nguyên và vốn đầu tư nước ngoài.",
+                        "Lao động giá rẻ và xuất khẩu nông sản.",
+                        "Khoa học \\- công nghệ, đổi mới sáng tạo và chuyển đổi số.",
+                        "Phát triển mạnh mẽ các ngành dịch vụ và du lịch."
                     ],
-                    "answer": "Nitrogen"
+                    "answer": "Khoa học \\- công nghệ, đổi mới sáng tạo và chuyển đổi số."
                 },
                 {
-                    "question": "What type of bond involves the sharing of electron pairs?",
+                    "question": "[VĂN KIỆN ĐH XIV] Câu 43: Văn kiện Đại hội XIV xác định yếu tố nào là \"trung tâm, chủ thể, mục tiêu và động lực\" của sự phát triển?",
                     "options": [
-                        "Ionic",
-                        "Covalent",
-                        "Hydrogen",
-                        "Metallic"
+                        "Công nghệ trí tuệ nhân tạo.",
+                        "Doanh nghiệp và doanh nhân.",
+                        "Con người.",
+                        "Thể chế kinh tế thị trường."
                     ],
-                    "answer": "Covalent"
-                }
-            ]
-        },
-        {
-            "name": "History",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Con người."
+                },
                 {
-                    "question": "Who was the first President of the USA?",
+                    "question": "[NQ 80 về phát triển văn hóa Việt Nam] Câu 43: Theo Nghị quyết số 80-NQ/TW năm 2026 về phát triển văn hóa Việt Nam , quan điểm về đầu tư cho văn hóa là gì?",
                     "options": [
-                        "George Washington",
-                        "Thomas Jefferson",
-                        "Abraham Lincoln",
-                        "John Adams"
+                        "Là đầu tư cho các hoạt động giải trí và nghệ thuật.",
+                        "Là nhiệm vụ thứ yếu sau đầu tư phát triển kinh tế.",
+                        "Là đầu tư cho phát triển bền vững đất nước, cho tương lai của dân tộc.",
+                        "Chủ yếu dựa vào nguồn lực từ xã hội hóa, không dùng ngân sách."
                     ],
-                    "answer": "George Washington"
+                    "answer": "Là đầu tư cho phát triển bền vững đất nước, cho tương lai của dân tộc."
                 },
                 {
-                    "question": "What year did World War II end?",
+                    "question": "[NQ 80 về phát triển văn hóa Việt Nam] Câu 45: Nghị quyết 80-NQ/TW về văn hóa xác định mục tiêu xây dựng hệ giá trị con người Việt Nam thời đại mới gồm các đặc tính nào?",
                     "options": [
-                        "1945",
-                        "1944",
-                        "1939",
-                        "1950"
+                        "Giàu có, sang trọng, hiện đại.",
+                        "Yêu nước, đoàn kết, tự cường, nghĩa tình, trung thực, trách nhiệm, kỷ cương, sáng tạo.",
+                        "Chỉ cần giỏi chuyên môn và ngoại ngữ.",
+                        "Ưu tiên các giá trị truyền thống, không tiếp nhận giá trị mới."
                     ],
-                    "answer": "1945"
+                    "answer": "Yêu nước, đoàn kết, tự cường, nghĩa tình, trung thực, trách nhiệm, kỷ cương, sáng tạo."
                 },
                 {
-                    "question": "Who wrote the Declaration of Independence?",
+                    "question": "[NQ 80 về phát triển văn hóa Việt Nam] Câu 46: Theo Nghị quyết số 80-NQ/TW về phát triển văn hóa Việt Nam. Chỉ tiêu chi ngân sách nhà nước hằng năm cho văn hóa đến năm 2030 được xác định tối thiểu là bao nhiêu?",
                     "options": [
-                        "George Washington",
-                        "John Adams",
-                        "Thomas Jefferson",
-                        "Benjamin Franklin"
+                        "1% tổng chi ngân sách nhà nước.",
+                        "2% tổng chi ngân sách nhà nước.",
+                        "3% tổng chi ngân sách nhà nước.",
+                        "5% tổng chi ngân sách nhà nước."
                     ],
-                    "answer": "Thomas Jefferson"
+                    "answer": "2% tổng chi ngân sách nhà nước."
                 },
                 {
-                    "question": "What ancient civilization built the pyramids?",
+                    "question": "[NQ 79 về phát triển kinh tế nhà nước] Câu 47: Nghị quyết số 79-NQ/TW về phát triển kinh tế nhà nước xác định vai trò của kinh tế nhà nước như thế nào?",
                     "options": [
-                        "Romans",
-                        "Greeks",
-                        "Egyptians",
-                        "Mayans"
+                        "Là thành phần kinh tế hỗ trợ cho kinh tế tư nhân.",
+                        "Giữ vai trò chủ đạo, là công cụ để Nhà nước điều tiết vĩ mô.",
+                        "Chỉ tập trung vào các lĩnh vực an ninh, quốc phòng.",
+                        "Rút dần khỏi các ngành kinh tế để nhường chỗ cho kinh tế có vốn đầu tư nước ngoài."
                     ],
-                    "answer": "Egyptians"
+                    "answer": "Giữ vai trò chủ đạo, là công cụ để Nhà nước điều tiết vĩ mô."
                 },
                 {
-                    "question": "Who was known as the 'Iron Lady'?",
+                    "question": "[NQ 79 về phát triển kinh tế nhà nước] Câu 48: Đến năm 2030, phấn đấu có bao nhiêu doanh nghiệp nhà nước vào nhóm 500 doanh nghiệp lớn nhất thế giới?",
                     "options": [
-                        "Margaret Thatcher",
-                        "Indira Gandhi",
-                        "Angela Merkel",
-                        "Golda Meir"
+                        "Từ 1 \\- 3 doanh nghiệp.",
+                        "Từ 5 \\- 10 doanh nghiệp.",
+                        "15 doanh nghiệp.",
+                        "Không đặt mục tiêu cụ thể."
                     ],
-                    "answer": "Margaret Thatcher"
+                    "answer": "Từ 1 \\- 3 doanh nghiệp."
                 },
                 {
-                    "question": "What was the main cause of the Cold War?",
+                    "question": "[NQ 79 về phát triển kinh tế nhà nước] Câu 49: Nghị quyết 79-NQ/TW xác định vai trò của kinh tế nhà nước là gì?",
                     "options": [
-                        "Capitalism vs. Communism",
-                        "Racism",
-                        "Imperialism",
-                        "Nationalism"
+                        "Là thành phần kinh tế hỗ trợ cho tư nhân.",
+                        "Giữ vai trò chủ đạo, là lực lượng vật chất quan trọng để Nhà nước điều tiết kinh tế.",
+                        "Rút lui khỏi các ngành dịch vụ công.",
+                        "Chỉ tập trung vào lĩnh vực nông nghiệp."
                     ],
-                    "answer": "Capitalism vs. Communism"
+                    "answer": "Giữ vai trò chủ đạo, là lực lượng vật chất quan trọng để Nhà nước điều tiết kinh tế."
                 },
                 {
-                    "question": "Who was the first man on the moon?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 50: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW) Tại thời điểm chi bộ xét kết nạp, người vào Đảng phải đủ bao nhiêu tuổi?",
                     "options": [
-                        "Neil Armstrong",
-                        "Buzz Aldrin",
-                        "Yuri Gagarin",
-                        "Michael Collins"
+                        "Đủ 18 tuổi đến đủ 55 tuổi.",
+                        "Đủ 18 tuổi đến đủ 60 tuổi (tính theo tháng).",
+                        "Trên 20 tuổi.",
+                        "Đủ 18 tuổi và không giới hạn tuổi tối đa."
                     ],
-                    "answer": "Neil Armstrong"
+                    "answer": "Đủ 18 tuổi đến đủ 60 tuổi (tính theo tháng)."
                 },
                 {
-                    "question": "What was the name of the ship that sank on its maiden voyage in 1912?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 51: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW). Đảng viên chính thức giới thiệu người vào Đảng phải cùng công tác hoặc sinh hoạt nơi cư trú với người đó ít nhất bao lâu?",
                     "options": [
-                        "Lusitania",
-                        "Titanic",
-                        "Olympic",
-                        "Britannic"
+                        "6 tháng.",
+                        "12 tháng.",
+                        "18 tháng.",
+                        "24 tháng."
                     ],
-                    "answer": "Titanic"
+                    "answer": "12 tháng."
                 },
                 {
-                    "question": "Which empire was known for its road system?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 52: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW). Thời hạn tổ chức lễ kết nạp đảng viên kể từ ngày có quyết định kết nạp là bao nhiêu ngày?",
                     "options": [
-                        "Roman Empire",
-                        "Ottoman Empire",
-                        "Mongol Empire",
-                        "Persian Empire"
+                        "15 ngày làm việc.",
+                        "30 ngày làm việc.",
+                        "45 ngày làm việc.",
+                        "60 ngày làm việc."
                     ],
-                    "answer": "Roman Empire"
+                    "answer": "30 ngày làm việc."
                 },
                 {
-                    "question": "What event sparked the start of World War I?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 53: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW). Tuổi Đảng của đảng viên được tính từ ngày nào?",
                     "options": [
-                        "Assassination of Archduke Ferdinand",
-                        "Invasion of Poland",
-                        "Attack on Pearl Harbor",
-                        "Fall of the Berlin Wall"
+                        "Ngày chi bộ họp xét kết nạp.",
+                        "Ngày cấp có thẩm quyền ban hành quyết định kết nạp.",
+                        "Ngày tổ chức lễ kết nạp.",
+                        "Ngày được công nhận là đảng viên chính thức."
                     ],
-                    "answer": "Assassination of Archduke Ferdinand"
-                }
-            ]
-        },
-        {
-            "name": "Geography",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Ngày cấp có thẩm quyền ban hành quyết định kết nạp."
+                },
                 {
-                    "question": "What is the largest continent?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 54: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW). Trường hợp đảng viên kết nạp lại, tuổi Đảng được tính như thế nào?",
                     "options": [
-                        "Asia",
-                        "Africa",
-                        "North America",
-                        "Europe"
+                        "Tính từ ngày có quyết định kết nạp lại.",
+                        "Tính từ ngày có quyết định kết nạp lần đầu, trừ thời gian không sinh hoạt Đảng.",
+                        "Tính từ ngày có quyết định chính thức của lần kết nạp thứ hai.",
+                        "Không được cộng dồn thời gian trước đó."
                     ],
-                    "answer": "Asia"
+                    "answer": "Tính từ ngày có quyết định kết nạp lần đầu, trừ thời gian không sinh hoạt Đảng."
                 },
                 {
-                    "question": "What river is the longest in the world?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 55: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW). Đảng viên bỏ sinh hoạt Đảng hoặc không đóng đảng phí bao lâu trong năm mà không có lý do chính đáng thì bị xóa tên?",
                     "options": [
-                        "Amazon",
-                        "Nile",
-                        "Yangtze",
-                        "Mississippi"
+                        "1 tháng.",
+                        "2 tháng.",
+                        "3 tháng.",
+                        "6 tháng."
                     ],
-                    "answer": "Nile"
+                    "answer": "3 tháng."
                 },
                 {
-                    "question": "What is the capital of Japan?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 56: Theo Quy định thi hành Điều lệ Đảng (Quy định 20-QĐ/TW). Đảng viên sinh hoạt tạm thời có quyền gì tại nơi sinh hoạt tạm thời?",
                     "options": [
-                        "Tokyo",
-                        "Seoul",
-                        "Beijing",
-                        "Bangkok"
+                        "Quyền biểu quyết, ứng cử và bầu cử.",
+                        "Trừ quyền biểu quyết, ứng cử và bầu cử.",
+                        "Chỉ có quyền phát biểu ý kiến, không có quyền đóng đảng phí.",
+                        "Có đầy đủ mọi quyền như đảng viên chính thức tại đó."
                     ],
-                    "answer": "Tokyo"
+                    "answer": "Trừ quyền biểu quyết, ứng cử và bầu cử."
                 },
                 {
-                    "question": "Which desert is the largest in the world?",
+                    "question": "[QĐ 20 về thi hành Điều lệ Đảng] Câu 57: Việc kỷ luật Đảng phải đảm bảo nguyên tắc gì?",
                     "options": [
-                        "Sahara",
-                        "Gobi",
-                        "Kalahari",
-                        "Atacama"
+                        "Nhẹ nhàng cho người có công.",
+                        "Công minh, chính xác, kịp thời, không có vùng cấm, không có ngoại lệ.",
+                        "Chỉ xử lý khi có đơn khiếu nại.",
+                        "Xử lý nội bộ, không công khai."
                     ],
-                    "answer": "Sahara"
+                    "answer": "Công minh, chính xác, kịp thời, không có vùng cấm, không có ngoại lệ."
                 },
                 {
-                    "question": "What country has the most natural lakes?",
+                    "question": "[QĐ 19 về công tác chính trị, tư tưởng trong Đảng] Câu 58: \"Tính nêu gương\" trong công tác chính trị tư tưởng yêu cầu đối tượng nào phải thực hiện trước?",
                     "options": [
-                        "Canada",
-                        "Russia",
-                        "USA",
-                        "India"
+                        "Đảng viên mới.",
+                        "Quần chúng ưu tú.",
+                        "Cán bộ giữ chức vụ càng cao càng phải gương mẫu.",
+                        "Chỉ dành cho lãnh đạo cấp Trung ương."
                     ],
-                    "answer": "Canada"
+                    "answer": "Cán bộ giữ chức vụ càng cao càng phải gương mẫu."
                 },
                 {
-                    "question": "Which country is known as the Land of the Rising Sun?",
+                    "question": "[QĐ 19 về công tác chính trị, tư tưởng trong Đảng] Câu 59: Phương châm trong đấu tranh phản bác các quan điểm sai trái, thù địch là gì?",
                     "options": [
-                        "China",
-                        "Japan",
-                        "Thailand",
-                        "South Korea"
+                        "Im lặng là vàng.",
+                        "Chủ động, kịp thời, linh hoạt, sáng tạo và hiệu quả.",
+                        "Chỉ đấu tranh trên báo chí in.",
+                        "Chờ hướng dẫn của cấp trên mới thực hiện."
                     ],
-                    "answer": "Japan"
+                    "answer": "Chủ động, kịp thời, linh hoạt, sáng tạo và hiệu quả."
                 },
                 {
-                    "question": "What is the capital of Australia?",
+                    "question": "[QĐ 19 về công tác chính trị, tư tưởng trong Đảng] Câu 60: Nội dung cốt lõi của công tác tư tưởng trong Đảng hiện nay là gì?",
                     "options": [
-                        "Canberra",
-                        "Sydney",
-                        "Melbourne",
-                        "Brisbane"
+                        "Học tập lý luận thuần túy.",
+                        "Bảo vệ nền tảng tư tưởng của Đảng, vận dụng và phát triển sáng tạo chủ nghĩa Mác-Lênin, tư tưởng Hồ Chí Minh.",
+                        "Chỉ tập trung vào phê bình người khác.",
+                        "Tuyên truyền về các thành tựu của nước ngoài."
                     ],
-                    "answer": "Canberra"
+                    "answer": "Bảo vệ nền tảng tư tưởng của Đảng, vận dụng và phát triển sáng tạo chủ nghĩa Mác-Lênin, tư tưởng Hồ Chí Minh."
                 },
                 {
-                    "question": "Which ocean is the largest?",
+                    "question": "[QĐ 19 về công tác chính trị, tư tưởng trong Đảng] Câu 61: \"4 kiên định\" theo Quy định số 19-QĐ/TW năm 2026 bao gồm những nội dung nào?",
                     "options": [
-                        "Atlantic",
-                        "Indian",
-                        "Arctic",
-                        "Pacific"
+                        "Kiên định Chủ nghĩa Mác-Lênin, tư tưởng Hồ Chí Minh; kiên định độc lập dân tộc và CNXH; kiên định đường lối đổi mới; kiên định các nguyên tắc tổ chức và hoạt động của Đảng.",
+                        "Kiên định mục tiêu dân giàu, nước mạnh, dân chủ, công bằng, văn minh.",
+                        "Kiên định vai trò chủ đạo của kinh tế nhà nước.",
+                        "Kiên định chính sách đối ngoại đa phương hóa, đa dạng hóa."
                     ],
-                    "answer": "Pacific"
+                    "answer": "Kiên định Chủ nghĩa Mác-Lênin, tư tưởng Hồ Chí Minh; kiên định độc lập dân tộc và CNXH; kiên định đường lối đổi mới; kiên định các nguyên tắc tổ chức và hoạt động của Đảng."
                 },
                 {
-                    "question": "What mountain range separates Europe and Asia?",
+                    "question": "[QĐ 19 về công tác chính trị, tư tưởng trong Đảng] Câu 62: Trong công tác chính trị tư tưởng, nhiệm vụ nào được coi là \"nhiệm vụ cơ bản, chiến lược, lâu dài\"?",
                     "options": [
-                        "Himalayas",
-                        "Rockies",
-                        "Andes",
-                        "Ural"
+                        "Nhiệm vụ \"Chống\".",
+                        "Nhiệm vụ \"Xây\".",
+                        "Cả \"Xây\" và \"Chống\" có vai trò ngang nhau.",
+                        "Đấu tranh phản bác quan điểm sai trái."
                     ],
-                    "answer": "Ural"
+                    "answer": "Nhiệm vụ \"Xây\"."
                 },
                 {
-                    "question": "What is the capital of Egypt?",
+                    "question": "[QĐ 19 về công tác chính trị, tư tưởng trong Đảng] Câu 63: Cơ quan nào chủ trì hướng dẫn thực hiện Quy định về công tác chính trị, tư tưởng trong Đảng?",
                     "options": [
-                        "Cairo",
-                        "Alexandria",
-                        "Giza",
-                        "Luxor"
+                        "Ban Tổ chức Trung ương.",
+                        "Ủy ban Kiểm tra Trung ương.",
+                        "Ban Tuyên giáo và Dân vận Trung ương.",
+                        "Văn phòng Trung ương Đảng."
                     ],
-                    "answer": "Cairo"
-                }
-            ]
-        },
-        {
-            "name": "Literature",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Ban Tuyên giáo và Dân vận Trung ương."
+                },
                 {
-                    "question": "Who wrote 'Romeo and Juliet'?",
+                    "question": "[NQ 04 về công tác phòng, chống tham nhũng, lãng phí, tiêu cực trong giai đoạn mới] Câu 64: Trụ cột trọng tâm của quốc gia liêm chính theo Nghị quyết 04-NQ/TW của Ban chấp hành Trung ương Đảng Khóa XIV về tiếp tục tăng cường sự lãnh đạo của Đảng đối với công tác phòng, chống tham nhũng, lãng phí, tiêu cực trong giai đoạn mới là gì?",
                     "options": [
-                        "Charles Dickens",
-                        "Jane Austen",
-                        "William Shakespeare",
-                        "Mark Twain"
+                        "Thể chế liêm chính \\- Nền công vụ liêm chính \\- Đội ngũ cán bộ, đảng viên liêm chính.",
+                        "Pháp luật nghiêm minh \\- Chính phủ số \\- Người dân giám sát.",
+                        "Kiểm soát quyền lực \\- Thu hồi tài sản \\- Xử lý nghiêm vi phạm.",
+                        "Cải cách hành chính \\- Công khai tài sản \\- Giáo dục đạo đức."
                     ],
-                    "answer": "William Shakespeare"
+                    "answer": "Thể chế liêm chính \\- Nền công vụ liêm chính \\- Đội ngũ cán bộ, đảng viên liêm chính."
                 },
                 {
-                    "question": "What is the first book of the Harry Potter series?",
+                    "question": "[NQ 04 về công tác phòng, chống tham nhũng, lãng phí, tiêu cực trong giai đoạn mới] Câu 65: Cốt lõi của công tác phòng, chống tham nhũng, lãng phí, tiêu cực theo Nghị quyết 04-NQ/TW của Ban chấp hành Trung ương Đảng Khóa XIV về tiếp tục tăng cường sự lãnh đạo của Đảng đối với công tác phòng, chống tham nhũng, lãng phí, tiêu cực trong giai đoạn mới là gì?",
                     "options": [
-                        "Harry Potter and the Goblet of Fire",
-                        "Harry Potter and the Chamber of Secrets",
-                        "Harry Potter and the Philosopher's Stone",
-                        "Harry Potter and the Order of the Phoenix"
+                        "Hình phạt thật nặng.",
+                        "Thu hồi hết tài sản.",
+                        "Kiểm soát quyền lực.",
+                        "Chuyển đổi số toàn diện."
                     ],
-                    "answer": "Harry Potter and the Philosopher's Stone"
+                    "answer": "Kiểm soát quyền lực."
                 },
                 {
-                    "question": "Who wrote 'The Great Gatsby'?",
+                    "question": "[NQ 04 về công tác phòng, chống tham nhũng, lãng phí, tiêu cực trong giai đoạn mới] Câu 66: Theo Nghị quyết 04-NQ/TW, mục tiêu tăng trưởng kinh tế mà công tác phòng chống tham nhũng phải phục vụ là bao nhiêu?",
                     "options": [
-                        "F. Scott Fitzgerald",
-                        "Ernest Hemingway",
-                        "J.D. Salinger",
-                        "Leo Tolstoy"
+                        "Tăng trưởng 5-6%/năm.",
+                        "Tăng trưởng \"2 con số\" liên tục trong những năm tới.",
+                        "Tăng trưởng cao nhất khu vực ASEAN.",
+                        "Giữ vững ổn định kinh tế vĩ mô, không cần tăng trưởng quá nhanh."
                     ],
-                    "answer": "F. Scott Fitzgerald"
+                    "answer": "Tăng trưởng \"2 con số\" liên tục trong những năm tới."
                 },
                 {
-                    "question": "What genre does '1984' belong to?",
+                    "question": "[NQ 05 về công tác kiểm tra, giám sát và kỷ luật Đảng] Câu 67: Phương châm xử lý vi phạm trong kiểm tra, giám sát và kỷ luật Đảng là gì?",
                     "options": [
-                        "Fiction",
-                        "Non-fiction",
-                        "Fantasy",
-                        "Dystopian"
+                        "Kịp thời, nghiêm minh, có tính giáo dục.",
+                        "Không có vùng cấm, không có ngoại lệ.",
+                        "Ưu tiên xử lý cán bộ cấp cao trước.",
+                        "Chỉ xử lý các vụ việc nghiêm trọng gây dư luận xấu."
                     ],
-                    "answer": "Dystopian"
+                    "answer": "Không có vùng cấm, không có ngoại lệ."
                 },
                 {
-                    "question": "Who is the author of 'Moby Dick'?",
+                    "question": "[NQ 05 về công tác kiểm tra, giám sát và kỷ luật Đảng] Câu 68: Một trong những yêu cầu của công tác kiểm tra, giám sát là phải góp phần gì?",
                     "options": [
-                        "Herman Melville",
-                        "Charles Dickens",
-                        "Leo Tolstoy",
-                        "Mark Twain"
+                        "Kiến tạo, thúc đẩy phát triển; bảo vệ người dám nghĩ, dám làm vì lợi ích chung.",
+                        "Làm giảm uy tín của những người làm sai.",
+                        "Thay thế toàn bộ bộ máy lãnh đạo ở những nơi có vi phạm.",
+                        "Tập trung vào việc truy tìm sai phạm của cá nhân."
                     ],
-                    "answer": "Herman Melville"
+                    "answer": "Kiến tạo, thúc đẩy phát triển; bảo vệ người dám nghĩ, dám làm vì lợi ích chung."
                 },
                 {
-                    "question": "What is the main theme of 'To Kill a Mockingbird'?",
+                    "question": "[NQ 71 về đột phá phát triển giáo dục và đào tạo] Câu 69: Đại hội XIV xác định \"Đột phá của mọi đột phá\" trong giai đoạn mới là gì?",
                     "options": [
-                        "Racism",
-                        "Friendship",
-                        "Love",
-                        "War"
+                        "Đột phá về hạ tầng giao thông đồng bộ.",
+                        "Đột phá về phát triển giáo dục, đào tạo và nguồn nhân lực chất lượng cao gắn với khoa học công nghệ.",
+                        "Đột phá về cải cách thể chế kinh tế thị trường.",
+                        "Đột phá về thu hút vốn đầu tư nước ngoài FDI."
                     ],
-                    "answer": "Racism"
+                    "answer": "Đột phá về phát triển giáo dục, đào tạo và nguồn nhân lực chất lượng cao gắn với khoa học công nghệ."
                 },
                 {
-                    "question": "Who wrote 'Pride and Prejudice'?",
+                    "question": "[NQ 71 về đột phá phát triển giáo dục và đào tạo] Câu 70: Mục tiêu trọng tâm của đột phá giáo dục theo tinh thần mới là gì?",
                     "options": [
-                        "Charlotte Brontë",
-                        "Jane Austen",
-                        "Virginia Woolf",
-                        "Emily Dickinson"
+                        "Tăng số lượng các trường đại học quốc tế.",
+                        "Chuyển mạnh từ giáo dục chú trọng trang bị kiến thức sang phát triển toàn diện năng lực và phẩm chất người học.",
+                        "Miễn học phí cho toàn bộ các cấp học.",
+                        "Phấn đấu 100% lao động có bằng đại học."
                     ],
-                    "answer": "Jane Austen"
+                    "answer": "Chuyển mạnh từ giáo dục chú trọng trang bị kiến thức sang phát triển toàn diện năng lực và phẩm chất người học."
                 },
                 {
-                    "question": "What is the setting of 'The Catcher in the Rye'?",
+                    "question": "[NQ 71 về đột phá phát triển giáo dục và đào tạo] Câu 71: Theo Nghị quyết số 71-NQ/TW của Bộ Chính trị về đột phá phát triển giáo dục và đào tạo, yếu tố nào được coi là \"quốc sách hàng đầu\"?",
                     "options": [
-                        "New York City",
-                        "London",
-                        "Paris",
-                        "Tokyo"
+                        "Phát triển kinh tế biển.",
+                        "Giáo dục và đào tạo cùng với khoa học và công nghệ.",
+                        "Phát triển hệ thống doanh nghiệp tư nhân.",
+                        "Công tác phòng chống tham nhũng."
                     ],
-                    "answer": "New York City"
+                    "answer": "Giáo dục và đào tạo cùng với khoa học và công nghệ."
                 },
                 {
-                    "question": "Who wrote 'The Odyssey'?",
+                    "question": "[NQ 71 về đột phá phát triển giáo dục và đào tạo] Câu 72: Đại hội XIV xác định tầm nhìn đến năm 2030, giáo dục Việt Nam đạt trình độ nào?",
                     "options": [
-                        "Homer",
-                        "Virgil",
-                        "Ovid",
-                        "Sophocles"
+                        "Đứng đầu Đông Nam Á.",
+                        "Thuộc nhóm các nước dẫn đầu trong khu vực và tiếp cận trình độ thế giới.",
+                        "Hoàn thành phổ cập giáo dục bậc đại học.",
+                        "Chỉ tập trung vào đào tạo nghề chất lượng cao."
                     ],
-                    "answer": "Homer"
+                    "answer": "Thuộc nhóm các nước dẫn đầu trong khu vực và tiếp cận trình độ thế giới."
                 },
                 {
-                    "question": "What is the main character's name in 'The Hunger Games'?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 73: Qua học tập, nghiên cứu Đâu là quan điểm chỉ đạo hàng đầu về công tác Giáo dục và Đào tạo (GD&ĐT) trong Nhà trường?",
                     "options": [
-                        "Katniss Everdeen",
-                        "Hermione Granger",
-                        "Bella Swan",
-                        "Luna Lovegood"
+                        "Là nhiệm vụ thường xuyên của các khoa, phòng.",
+                        "Là nhiệm vụ chính trị trung tâm, quan trọng hàng đầu, là động lực then chốt quyết định chất lượng hoàn thành nhiệm vụ.",
+                        "Là nội dung phối hợp giữa nhà trường và các đơn vị ngoài quân đội.",
+                        "Là chỉ tiêu đánh giá phong trào thi đua quyết thắng hàng năm."
                     ],
-                    "answer": "Katniss Everdeen"
-                }
-            ]
-        },
-        {
-            "name": "Art",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Là nhiệm vụ chính trị trung tâm, quan trọng hàng đầu, là động lực then chốt quyết định chất lượng hoàn thành nhiệm vụ."
+                },
                 {
-                    "question": "Who painted the Mona Lisa?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 74: \"Khâu đột phá\" quan trọng, nhiệm vụ trọng tâm thường xuyên của các cơ quan, khoa, đơn vị được xác định là gì?",
                     "options": [
-                        "Vincent van Gogh",
-                        "Pablo Picasso",
-                        "Leonardo da Vinci",
-                        "Claude Monet"
+                        "Đầu tư mua sắm trang thiết bị hiện đại.",
+                        "Tổ chức các kỳ thi sát hạch định kỳ.",
+                        "Đổi mới mạnh mẽ tư duy trong lãnh đạo, chỉ đạo và quản lý GD&ĐT.",
+                        "Tăng cường giao lưu quốc tế về giáo dục."
                     ],
-                    "answer": "Leonardo da Vinci"
+                    "answer": "Đổi mới mạnh mẽ tư duy trong lãnh đạo, chỉ đạo và quản lý GD&ĐT."
                 },
                 {
-                    "question": "What art movement is associated with Andy Warhol?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 75: Mục tiêu đến năm 2030, tỷ lệ giảng viên có trình độ sau đại học của Nhà trường đạt mức nào?",
                     "options": [
-                        "Impressionism",
-                        "Surrealism",
-                        "Pop Art",
-                        "Cubism"
+                        "Trên 70% (trong đó Tiến sĩ đạt 20%).",
+                        "Trên 80% (trong đó Tiến sĩ đạt 30%).",
+                        "Trên 85% (trong đó Tiến sĩ đạt 25% trở lên).",
+                        "100% có trình độ Thạc sĩ trở lên."
                     ],
-                    "answer": "Pop Art"
+                    "answer": "Trên 85% (trong đó Tiến sĩ đạt 25% trở lên)."
                 },
                 {
-                    "question": "Who sculpted David?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 76: Theo văn bản, đâu là \"động lực\" của quá trình GD&ĐT trong bối cảnh hiện nay?",
                     "options": [
-                        "Michelangelo",
-                        "Donatello",
-                        "Bernini",
-                        "Rodin"
+                        "Tăng học phí và kinh phí đầu tư.",
+                        "Khoa học công nghệ, chuyển đổi số và trí tuệ nhân tạo (AI).",
+                        "Việc tăng số lượng học viên hàng năm.",
+                        "Việc mở rộng quy mô diện tích nhà trường."
                     ],
-                    "answer": "Michelangelo"
+                    "answer": "Khoa học công nghệ, chuyển đổi số và trí tuệ nhân tạo (AI)."
                 },
                 {
-                    "question": "What is the primary medium of a watercolor painting?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 77: Tầm nhìn đến năm 2045 của Nhà trường là gì?",
                     "options": [
-                        "Oil",
-                        "Acrylic",
-                        "Water",
-                        "Charcoal"
+                        "Trở thành trung tâm đào tạo đa ngành lớn nhất khu vực.",
+                        "Xây dựng Nhà trường thông minh, hiện đại và hội nhập quốc tế sâu rộng.",
+                        "Hoàn thành việc số hóa 100% giáo trình cũ.",
+                        "Thay thế toàn bộ giảng viên bằng hệ thống dạy học ảo."
                     ],
-                    "answer": "Water"
+                    "answer": "Xây dựng Nhà trường thông minh, hiện đại và hội nhập quốc tế sâu rộng."
                 },
                 {
-                    "question": "Which artist is known for his murals in Mexico?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 78: Đề án nào được nhắc đến nhằm nâng cao trình độ ngoại ngữ cho cán bộ, học viên giai đoạn 2025-2035?",
                     "options": [
-                        "Diego Rivera",
-                        "Frida Kahlo",
-                        "David Alfaro Siqueiros",
-                        "Rufino Tamayo"
+                        "Đưa tiếng Anh thành ngôn ngữ thứ hai trong trường học.",
+                        "Phổ cập tiếng Trung và tiếng Anh chuyên ngành thông tin.",
+                        "Đào tạo biên dịch viên quân sự cấp cao.",
+                        "Xuất khẩu giáo trình điện tử bằng tiếng nước ngoài."
                     ],
-                    "answer": "Diego Rivera"
+                    "answer": "Đưa tiếng Anh thành ngôn ngữ thứ hai trong trường học."
                 },
                 {
-                    "question": "What is the term for the art of paper folding?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 79: Trọng tâm của việc đổi mới phương pháp dạy và học được xác định là gì?",
                     "options": [
-                        "Origami",
-                        "Calligraphy",
-                        "Decoupage",
-                        "Papercraft"
+                        "Lấy người dạy làm trung tâm, người học hỗ trợ.",
+                        "Lấy người học làm trung tâm, người dạy hướng dẫn, chuyển từ truyền thụ sang tổ chức học tập chủ động.",
+                        "Tập trung vào việc đọc chép để đảm bảo đủ nội dung giáo trình.",
+                        "Giảm tối đa thời gian thực hành, tăng thời gian lý thuyết."
                     ],
-                    "answer": "Origami"
+                    "answer": "Lấy người học làm trung tâm, người dạy hướng dẫn, chuyển từ truyền thụ sang tổ chức học tập chủ động."
                 },
                 {
-                    "question": "Who is known for the painting 'The Starry Night'?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 80: Trong nhiệm vụ xây dựng đội ngũ, Nhà trường ưu tiên đào tạo nguồn nhân lực chất lượng cao ở lĩnh vực nào?",
                     "options": [
-                        "Vincent van Gogh",
-                        "Pablo Picasso",
-                        "Claude Monet",
-                        "Henri Matisse"
+                        "Quản trị hành chính và hậu cần.",
+                        "Kỹ thuật chiến thuật bộ binh.",
+                        "Hệ thống TTLLqs, công nghệ cao, an ninh mạng, tác chiến điện tử và AI.",
+                        "Thể dục thể thao và văn hóa văn nghệ."
                     ],
-                    "answer": "Vincent van Gogh"
+                    "answer": "Hệ thống TTLLqs, công nghệ cao, an ninh mạng, tác chiến điện tử và AI."
                 },
                 {
-                    "question": "What is the term for a painting done on wet plaster?",
+                    "question": "[NQ 341-NQ/ĐU của Đảng ủy TSQTT về đột phá phát triển giáo dục và đào tạo trong Nhà trường] Câu 81: \"Mô hình sư phạm thông minh\" và \"Lớp học thông minh\" là kết quả của việc thực hiện nhiệm vụ nào?",
                     "options": [
-                        "Fresco",
-                        "Tempera",
-                        "Encaustic",
-                        "Mosaic"
+                        "Cải tạo cơ sở hạ tầng cũ.",
+                        "Đẩy mạnh chuyển đổi số toàn diện và ứng dụng mạnh mẽ công nghệ số, AI.",
+                        "Thực hiện chính sách đặc thù cho giảng viên.",
+                        "Hợp tác với các doanh nghiệp viễn thông trong nước."
                     ],
-                    "answer": "Fresco"
+                    "answer": "Đẩy mạnh chuyển đổi số toàn diện và ứng dụng mạnh mẽ công nghệ số, AI."
                 },
                 {
-                    "question": "Who created the sculpture 'The Thinker'?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 82: Mục đích cốt lõi của việc thực hiện Mô hình “2 nắm”, “3 nên”, “5 không” là gì?",
                     "options": [
-                        "Auguste Rodin",
-                        "Henri Matisse",
-                        "Alberto Giacometti",
-                        "Louise Bourgeois"
+                        "Chuyển từ trạng thái “giải quyết hậu quả” sang “phòng ngừa từ sớm, từ xa”.",
+                        "Tập trung tối đa vào việc xử lý nghiêm các trường hợp vi phạm kỷ luật.",
+                        "Thay thế hoàn toàn các hình thức quản lý tư tưởng truyền thống.",
+                        "Chỉ áp dụng đối với những quân nhân có biểu hiện vi phạm kỷ luật."
                     ],
-                    "answer": "Auguste Rodin"
+                    "answer": "Chuyển từ trạng thái “giải quyết hậu quả” sang “phòng ngừa từ sớm, từ xa”."
                 },
                 {
-                    "question": "What is the main focus of abstract art?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 83: Nội dung “Nắm thông tin về tư tưởng” bao gồm việc nắm bắt các yếu tố nào?",
                     "options": [
-                        "Realism",
-                        "Expression",
-                        "Geometry",
-                        "Color"
+                        "Chỉ nắm bắt kết quả thực hiện nhiệm vụ chuyên môn hàng ngày.",
+                        "Hoàn cảnh gia đình, đặc điểm tâm lý, các mối quan hệ xã hội của quân nhân.",
+                        "Chỉ nắm bắt danh sách các quân nhân vi phạm kỷ luật trong tháng.",
+                        "Các quy định, điều lệnh và chế độ sinh hoạt của đơn vị."
                     ],
-                    "answer": "Expression"
-                }
-            ]
-        },
-        {
-            "name": "Music",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Hoàn cảnh gia đình, đặc điểm tâm lý, các mối quan hệ xã hội của quân nhân."
+                },
                 {
-                    "question": "Who composed the Four Seasons?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 84: Khi giao nhiệm vụ cho cá nhân, tiêu chí “6 rõ” bao gồm những nội dung nào?",
                     "options": [
-                        "Ludwig van Beethoven",
-                        "Johann Sebastian Bach",
-                        "Antonio Vivaldi",
-                        "Wolfgang Amadeus Mozart"
+                        "Rõ mục tiêu, rõ phương pháp, rõ kết quả, rõ khen thưởng, rõ kỷ luật, rõ thời gian.",
+                        "Rõ người, rõ việc, rõ thời gian, rõ trách nhiệm, rõ sản phẩm, rõ thẩm quyền.",
+                        "Rõ nhiệm vụ, rõ đối tượng, rõ địa điểm, rõ phương tiện, rõ thời hạn, rõ báo cáo.",
+                        "Rõ cán bộ, rõ chiến sĩ, rõ đơn vị, rõ nội dung, rõ hình thức, rõ kết quả."
                     ],
-                    "answer": "Antonio Vivaldi"
+                    "answer": "Rõ người, rõ việc, rõ thời gian, rõ trách nhiệm, rõ sản phẩm, rõ thẩm quyền."
                 },
                 {
-                    "question": "What is the term for the speed of a piece of music?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 85: Nội dung “Nên tôn trọng” yêu cầu cán bộ phải thực hiện điều gì?",
                     "options": [
-                        "Tempo",
-                        "Rhythm",
-                        "Melody",
-                        "Harmony"
+                        "Không lạm dụng mệnh lệnh hành chính, không miệt thị xúc phạm nhân cách cấp dưới.",
+                        "Luôn đồng ý với mọi yêu cầu cá nhân của chiến sĩ để tạo sự thoải mái.",
+                        "Giữ khoảng cách tuyệt đối để duy trì uy nghiêm của người chỉ huy.",
+                        "Chỉ tôn trọng những quân nhân có thành tích học tập và công tác tốt."
                     ],
-                    "answer": "Tempo"
+                    "answer": "Không lạm dụng mệnh lệnh hành chính, không miệt thị xúc phạm nhân cách cấp dưới."
                 },
                 {
-                    "question": "Which instrument is known as the king of instruments?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 86: Phương pháp nào thể hiện đúng tinh thần của nội dung “Nên đồng hành”?",
                     "options": [
-                        "Piano",
-                        "Organ",
-                        "Violin",
-                        "Guitar"
+                        "Cán bộ thường xuyên xuống cơ sở, cùng sinh hoạt, học tập và làm việc với bộ đội.",
+                        "Giao toàn bộ nhiệm vụ khó khăn cho cấp dưới tự xoay sở để rèn luyện ý chí.",
+                        "Chỉ xuất hiện tại đơn vị khi có các buổi kiểm tra hoặc sơ kết quan trọng.",
+                        "Tổ chức các buổi liên hoan thường xuyên để gắn kết tình cảm đơn vị."
                     ],
-                    "answer": "Organ"
+                    "answer": "Cán bộ thường xuyên xuống cơ sở, cùng sinh hoạt, học tập và làm việc với bộ đội."
                 },
                 {
-                    "question": "Who is known as the 'Queen of Pop'?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 87: “Không mất dân chủ” trong quản lý tư tưởng yêu cầu điều gì ở người cán bộ?",
                     "options": [
-                        "Madonna",
-                        "Beyoncé",
-                        "Lady Gaga",
-                        "Taylor Swift"
+                        "Mọi quyết định đều phải được 100% quân nhân đồng ý trước khi thực hiện.",
+                        "Công khai, minh bạch trong giải quyết chế độ chính sách và xử lý vi phạm.",
+                        "Tuyệt đối không được phê bình quân nhân trước tập thể trong bất kỳ trường hợp nào.",
+                        "Cho phép quân nhân tự do lựa chọn nhiệm vụ theo sở thích cá nhân."
                     ],
-                    "answer": "Madonna"
+                    "answer": "Công khai, minh bạch trong giải quyết chế độ chính sách và xử lý vi phạm."
                 },
                 {
-                    "question": "What is a musical scale?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 88: Thái độ đúng đắn của người chỉ huy theo nội dung “Không cô lập” khi quân nhân mắc lỗi là gì?",
                     "options": [
-                        "A series of notes",
-                        "A type of rhythm",
-                        "A form of harmony",
-                        "A pattern of chords"
+                        "Tạm thời cách ly quân nhân đó khỏi các hoạt động tập thể để tự hối lỗi.",
+                        "Gần gũi, giáo dục, giúp đỡ quân nhân nhận thức sai lầm để sửa chữa.",
+                        "Chỉ giao những nhiệm vụ thấp kém nhất cho người mắc lỗi để răn đe.",
+                        "Yêu cầu tập thể đơn vị không được tiếp xúc với người đang chịu kỷ luật."
                     ],
-                    "answer": "A series of notes"
+                    "answer": "Gần gũi, giáo dục, giúp đỡ quân nhân nhận thức sai lầm để sửa chữa."
                 },
                 {
-                    "question": "Which composer is known for his symphonies?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 89: Nội dung “Không tạo áp lực” nhấn mạnh việc chuyển đổi trạng thái nào?",
                     "options": [
-                        "Johannes Brahms",
-                        "Claude Debussy",
-                        "Frédéric Chopin",
-                        "Gustav Mahler"
+                        "Chuyển từ chấp hành do ép buộc sang chấp hành do nhận thức và trách nhiệm.",
+                        "Chuyển từ huấn luyện cường độ cao sang huấn luyện nhẹ nhàng, thư giãn.",
+                        "Chuyển từ trách nhiệm cá nhân sang trách nhiệm tập thể hoàn toàn.",
+                        "Chuyển từ việc thực hiện đúng điều lệnh sang thực hiện theo cảm xúc cá nhân."
                     ],
-                    "answer": "Gustav Mahler"
+                    "answer": "Chuyển từ chấp hành do ép buộc sang chấp hành do nhận thức và trách nhiệm."
                 },
                 {
-                    "question": "What is the name of the famous music festival held in Coachella Valley?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 90: Để “Không xung đột lợi ích”, người chỉ huy cần đảm bảo nguyên tắc nào?",
                     "options": [
-                        "Lollapalooza",
-                        "Glastonbury",
-                        "Coachella",
-                        "Burning Man"
+                        "Ưu tiên giải quyết các quyền lợi cho quân nhân có thâm niên công tác lâu nhất.",
+                        "Đặt lợi ích cá nhân của cán bộ lên trên để làm mục tiêu phấn đấu cho cấp dưới.",
+                        "Công tâm, khách quan, đặt lợi ích tập thể lên trên lợi ích cá nhân.",
+                        "Giải quyết các chế độ theo hình thức bốc thăm ngẫu nhiên để đảm bảo công bằng."
                     ],
-                    "answer": "Coachella"
+                    "answer": "Công tâm, khách quan, đặt lợi ích tập thể lên trên lợi ích cá nhân."
                 },
                 {
-                    "question": "What instrument is typically used in jazz music?",
+                    "question": "[Mô hình QLTT QN ở TSQTT] Câu 91: Quy trình thực hiện Mô hình “2 nắm”, “3 nên”, “5 không” gồm mấy bước?",
                     "options": [
-                        "Guitar",
-                        "Piano",
-                        "Trumpet",
-                        "Drums"
+                        "3 bước.",
+                        "4 bước (Phổ biến; Tổ chức thực hiện; Kiểm tra; Sơ tổng kết).",
+                        "5 bước.",
+                        "6 bước"
                     ],
-                    "answer": "Trumpet"
+                    "answer": "4 bước (Phổ biến; Tổ chức thực hiện; Kiểm tra; Sơ tổng kết)."
                 },
                 {
-                    "question": "Who wrote the opera 'Carmen'?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 92: Qua học tập, nghiên cứu chuyên đề: “Học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh trở thành nhu cầu tự thân của cán bộ, đảng viên và quần chúng trong Quân đội hiện nay”. Biểu hiện cụ thể của \"nhu cầu tự thân\" ở cán bộ, chiến sĩ thể hiện rõ nhất ở đặc điểm nào?",
                     "options": [
-                        "Giuseppe Verdi",
-                        "Giacomo Puccini",
-                        "Georges Bizet",
-                        "Wolfgang Amadeus Mozart"
+                        "Thực hiện nhiệm vụ khi có sự đôn đốc, kiểm tra thường xuyên của cấp ủy và người chỉ huy.",
+                        "Sống có mục đích, lý tưởng, ý thức tự học tập, tự rèn luyện, điều chỉnh hành vi theo các chuẩn mực đạo đức và pháp luật.",
+                        "Chỉ tập trung khẳng định giá trị cá nhân thông qua các bằng khen và danh hiệu thi đua.",
+                        "Tham gia các buổi sinh hoạt chính trị để đủ điều kiện xét phân loại đảng viên cuối năm."
                     ],
-                    "answer": "Georges Bizet"
+                    "answer": "Sống có mục đích, lý tưởng, ý thức tự học tập, tự rèn luyện, điều chỉnh hành vi theo các chuẩn mực đạo đức và pháp luật."
                 },
                 {
-                    "question": "What is the most widely used musical notation?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 93: Qua học tập, nghiên cứu chuyên đề: “Học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh trở thành nhu cầu tự thân của cán bộ, đảng viên và quần chúng trong Quân đội hiện nay”. Trong các giải pháp cơ bản, nội dung nào sau đây thuộc về việc phát huy vai trò của đội ngũ chính ủy, chính trị viên?",
                     "options": [
-                        "Standard notation",
-                        "Tablature",
-                        "Figured bass",
-                        "Graphic notation"
+                        "Chỉ đạo làm tốt công tác kiểm tra, giám sát đảng viên và tổ chức đảng.",
+                        "Trực tiếp tuyên truyền, giáo dục, định hướng nhận thức tư tưởng cho bộ đội qua các hình thức như diễn đàn, tọa đàm, kể chuyện Bác Hồ.",
+                        "Cụ thể hóa nội dung học tập vào kế hoạch công tác và huấn luyện của đơn vị.",
+                        "Bảo đảm đầy đủ chế độ ăn, mặc, nơi ở và trang thiết bị cho bộ đội."
                     ],
-                    "answer": "Standard notation"
-                }
-            ]
-        },
-        {
-            "name": "Sports",
-            "image": "/images/quiz.png",
-            "questions": [
+                    "answer": "Trực tiếp tuyên truyền, giáo dục, định hướng nhận thức tư tưởng cho bộ đội qua các hình thức như diễn đàn, tọa đàm, kể chuyện Bác Hồ."
+                },
                 {
-                    "question": "Which sport is known as 'the beautiful game'?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 94: Qua học tập, nghiên cứu chuyên đề: “Học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh trở thành nhu cầu tự thân của cán bộ, đảng viên và quần chúng trong Quân đội hiện nay”. Yêu cầu \"kết hợp chặt chẽ giữa xây và chống\" trong quân đội nhằm mục tiêu gì?",
                     "options": [
-                        "Basketball",
-                        "Cricket",
-                        "Soccer",
-                        "Tennis"
+                        "Để thay thế hoàn toàn công tác kiểm tra, giám sát bằng việc tự học tập.",
+                        "Nhằm tập trung tối đa vào việc phê bình các cá nhân có sai phạm trong đơn vị.",
+                        "Bảo đảm sự thống nhất giữa rèn luyện phẩm chất tốt đẹp với đấu tranh loại bỏ những biểu hiện sai trái, lệch chuẩn.",
+                        "Chỉ nhằm mục đích xây dựng cảnh quan đơn vị \"Sáng, xanh, sạch, đẹp\"."
                     ],
-                    "answer": "Soccer"
+                    "answer": "Bảo đảm sự thống nhất giữa rèn luyện phẩm chất tốt đẹp với đấu tranh loại bỏ những biểu hiện sai trái, lệch chuẩn."
                 },
                 {
-                    "question": "How many players are on a basketball team?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 95: Qua học tập, nghiên cứu chuyên đề: “Tăng cường công tác dân vận của Quân đội trên địa bàn trọng điểm về quốc phòng, an ninh”. Địa bàn trọng điểm về quốc phòng, an ninh được xác định dựa trên bao nhiêu tiêu chí cơ bản?",
                     "options": [
-                        "5",
-                        "6",
-                        "7",
-                        "8"
+                        "2 tiêu chí",
+                        "3 tiêu chí",
+                        "4 tiêu chí",
+                        "5 tiêu chí"
                     ],
-                    "answer": "5"
+                    "answer": "3 tiêu chí"
                 },
                 {
-                    "question": "Which country hosted the 2016 Summer Olympics?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 96: Qua học tập, nghiên cứu chuyên đề: “Tăng cường công tác dân vận của Quân đội trên địa bàn trọng điểm về quốc phòng, an ninh”. Hình thức dân vận nào sau đây được tài liệu xác định là hình thức \"gián tiếp\" trên địa bàn trọng điểm?",
                     "options": [
-                        "USA",
-                        "China",
-                        "Brazil",
-                        "UK"
+                        "Tổ chức kết nghĩa giữa đơn vị quân đội với các cơ quan, đoàn thể địa phương.",
+                        "Hành quân dã ngoại làm công tác dân vận.",
+                        "Cử các tổ, đội công tác và cán bộ biệt phái tăng cường về cơ sở.",
+                        "Phát huy vai trò của các già làng, trưởng bản, chức sắc tôn giáo tiến bộ và người có uy tín."
                     ],
-                    "answer": "Brazil"
+                    "answer": "Phát huy vai trò của các già làng, trưởng bản, chức sắc tôn giáo tiến bộ và người có uy tín."
                 },
                 {
-                    "question": "What is the highest score possible in a game of bowling?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 97: Qua học tập, nghiên cứu chuyên đề: “Tăng cường công tác dân vận của Quân đội trên địa bàn trọng điểm về quốc phòng, an ninh”. Giải pháp quan trọng hàng đầu, có ý nghĩa quyết định nâng cao chất lượng công tác dân vận của Quân đội trên địa bàn trọng điểm là gì?",
                     "options": [
-                        "200",
-                        "300",
-                        "100",
-                        "400"
+                        "Tăng cường sự lãnh đạo, chỉ đạo của cấp ủy, tổ chức đảng; phát huy vai trò của chính ủy, chính trị viên và người chỉ huy.",
+                        "Tổ chức thăm hỏi, tặng quà cho các gia đình có hoàn cảnh đặc biệt khó khăn.",
+                        "Mở rộng quan hệ đối ngoại với quân đội các nước láng giềng có chung biên giới.",
+                        "Sử dụng lực lượng quân đội để giải quyết các \"điểm nóng\" khi chưa có lệnh của cấp trên."
                     ],
-                    "answer": "300"
+                    "answer": "Tăng cường sự lãnh đạo, chỉ đạo của cấp ủy, tổ chức đảng; phát huy vai trò của chính ủy, chính trị viên và người chỉ huy."
                 },
                 {
-                    "question": "What is the national sport of Japan?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 98: Qua học tập, nghiên cứu chuyên đề: “Đẩy mạnh học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh về tình yêu thương đồng chí đồng đội trong Quân đội hiện nay”. Yếu tố nào được coi là \"sợi chỉ đỏ\" xuyên suốt, tạo nên sức mạnh chiến đấu của quân đội cách mạng?",
                     "options": [
-                        "Karate",
-                        "Sumo Wrestling",
-                        "Baseball",
-                        "Soccer"
+                        "Sự trang bị vũ khí, kỹ thuật hiện đại.",
+                        "Tình thương yêu đồng chí, đồng đội chân thành, sâu sắc.",
+                        "Các quy định nghiêm ngặt về kỷ luật quân đội.",
+                        "Các chế độ chính sách về tiền lương và phụ cấp."
                     ],
-                    "answer": "Sumo Wrestling"
+                    "answer": "Tình thương yêu đồng chí, đồng đội chân thành, sâu sắc."
                 },
                 {
-                    "question": "Which sport uses a bat and ball and is played on a diamond?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 99: Qua học tập, nghiên cứu chuyên đề: “Đẩy mạnh học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh về tình yêu thương đồng chí đồng đội trong Quân đội hiện nay”. Biểu hiện của tình thương yêu đồng chí, đồng đội trong tư tưởng của Bác không bao gồm nội dung nào sau đây?",
                     "options": [
-                        "Cricket",
-                        "Baseball",
-                        "Softball",
-                        "Lacrosse"
+                        "Thương yêu, giúp đỡ nhau trong công tác, học tập và đời sống.",
+                        "Thẳng thắn tự phê bình và phê bình để giúp nhau cùng tiến bộ.",
+                        "Bao che, giấu giếm khuyết điểm cho nhau để giữ gìn đoàn kết nội bộ.",
+                        "Chia ngọt sẻ bùi, đồng cam cộng khổ giữa người chỉ huy và chiến sĩ."
                     ],
-                    "answer": "Baseball"
+                    "answer": "Bao che, giấu giếm khuyết điểm cho nhau để giữ gìn đoàn kết nội bộ."
                 },
                 {
-                    "question": "What is the length of an Olympic swimming pool?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 100: Qua học tập, nghiên cứu chuyên đề: “Đẩy mạnh học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh về tình yêu thương đồng chí đồng đội trong Quân đội hiện nay”. Giải pháp nào sau đây có ý nghĩa then chốt để xây dựng tình đồng chí, đồng đội \"mẫu mực, tiêu biểu\" tại đơn vị?",
                     "options": [
-                        "25 meters",
-                        "50 meters",
-                        "100 meters",
-                        "75 meters"
+                        "Nêu cao vai trò tiền phong, gương mẫu của đội ngũ cán bộ, đảng viên, nhất là người chủ trì.",
+                        "Tổ chức các buổi liên hoan văn nghệ, thể thao thường xuyên.",
+                        "Tăng cường mức xử phạt đối với các hành vi vi phạm kỷ luật.",
+                        "Tập trung đầu tư xây dựng cảnh quan môi trường doanh trại."
                     ],
-                    "answer": "50 meters"
+                    "answer": "Nêu cao vai trò tiền phong, gương mẫu của đội ngũ cán bộ, đảng viên, nhất là người chủ trì."
                 },
                 {
-                    "question": "Who holds the record for the most home runs in MLB history?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 111: Qua học tập, nghiên cứu Chuyên đề: “Nâng cao nhận thức, trách nhiệm của quân nhân trong thực hiện bộ tiêu chí Quân đội nhân dân Việt Nam hiện đại”. Tiêu chí nào sau đây được xếp ở vị trí quan trọng nhất là?",
                     "options": [
-                        "Babe Ruth",
-                        "Barry Bonds",
-                        "Hank Aaron",
-                        "Ted Williams"
+                        "Tổ chức biên chế.",
+                        "Vững mạnh về chính trị.",
+                        "Vũ khí, trang bị kỹ thuật.",
+                        "Huấn luyện \\- đào tạo."
                     ],
-                    "answer": "Barry Bonds"
+                    "answer": "Vững mạnh về chính trị."
                 },
                 {
-                    "question": "Which country has won the most FIFA World Cups?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 112: Qua học tập, nghiên cứu Chuyên đề: “Nâng cao nhận thức, trách nhiệm của quân nhân trong thực hiện bộ tiêu chí Quân đội nhân dân Việt Nam hiện đại”. Nghị quyết Đại hội Đảng bộ Quân đội lần thứ XII xác định đột phá nào sau đây là trọng tâm trong việc phát triển nguồn nhân lực?",
                     "options": [
-                        "Germany",
-                        "Brazil",
-                        "Italy",
-                        "Argentina"
+                        "Mua sắm và tự sản xuất toàn bộ vũ khí công nghệ cao.",
+                        "Tập trung phát triển nguồn nhân lực chất lượng cao; đẩy mạnh thu hút, trọng dụng nhân tài.",
+                        "Thay đổi toàn bộ hệ thống điều lệnh, điều lệ quản lý bộ đội.",
+                        "Mở rộng liên kết đào tạo với tất cả các quốc gia trên thế giới."
                     ],
-                    "answer": "Brazil"
+                    "answer": "Tập trung phát triển nguồn nhân lực chất lượng cao; đẩy mạnh thu hút, trọng dụng nhân tài."
                 },
                 {
-                    "question": "What is the only sport to have been played on the moon?",
+                    "question": "[Các Chuyên đề GDCT 6 tháng đầu năm] Câu 113: Qua học tập, nghiên cứu Chuyên đề: “Nâng cao nhận thức, trách nhiệm của quân nhân trong thực hiện bộ tiêu chí Quân đội nhân dân Việt Nam hiện đại”. Đâu là yêu cầu quan trọng về phương pháp để nâng cao nhận thức, trách nhiệm của quân nhân trong thực hiện Bộ tiêu chí hiện đại hóa?",
                     "options": [
-                        "Golf",
-                        "Baseball",
-                        "Soccer",
-                        "Tennis"
+                        "Chỉ tập trung vào công tác \"chống\", xử lý nghiêm các sai phạm để làm gương.",
+                        "Giao khoán toàn bộ việc thực hiện tiêu chí cho cán bộ chính trị cơ sở.",
+                        "Tiến hành thường xuyên, liên tục, kết hợp chặt chẽ giữa “xây” và “chống”, lấy “xây” là chính.",
+                        "Chỉ thực hiện tuyên truyền khi đơn vị bước vào giai đoạn huấn luyện cao điểm."
                     ],
-                    "answer": "Golf"
+                    "answer": "Tiến hành thường xuyên, liên tục, kết hợp chặt chẽ giữa “xây” và “chống”, lấy “xây” là chính."
                 }
             ]
         }

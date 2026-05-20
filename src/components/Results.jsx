@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Tác giả: Nguyễn Văn Đạt | Email: nguyenvandatsqtt@gmail.com
+ * Mô tả: Thành phần Results hiển thị bảng thống kê chi tiết kết quả ôn luyện trắc nghiệm của người dùng.
+ * Đã được Việt hóa hoàn toàn và tối ưu hóa giao diện trực quan.
+ * Dành riêng cho mục đích ôn luyện nội bộ.
+ */
+
 import { useEffect, useState } from "react";
 import { FaTrophy, FaCheckCircle, FaTimesCircle, FaQuestionCircle, FaPercentage, FaClock, FaStopwatch } from "react-icons/fa";
 import Confetti from 'react-confetti';
@@ -15,11 +22,11 @@ const Results = ({
   timeSpent,
   averageTimePerQuestion,
 }) => {
-  // Set the state for confetti
+  // Hiệu ứng pháo hoa chúc mừng
   const [showConfetti, setShowConfetti] = useState(true);
   const { width, height } = useWindowSize();
 
-  // Disable confetti after a few seconds
+  // Tắt hiệu ứng pháo hoa sau 7 giây để tiết kiệm tài nguyên
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowConfetti(false);
@@ -32,86 +39,86 @@ const Results = ({
       {showConfetti && <Confetti width={width} height={height} numberOfPieces={700} />}
 
       <h2 className="text-3xl font-bold mb-6 text-center text-blue-600">
-        Quiz Results
+        Kết quả ôn luyện
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
         
-        {/* Total Points */}
+        {/* Tổng điểm tích lũy */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Total Points</p>
+            <p className="text-xl font-semibold text-gray-700">Tổng điểm tích lũy</p>
             <p className="text-lg font-bold text-green-600">{score}</p>
           </div>
           <FaTrophy className="text-yellow-500 text-3xl" />
         </div>
 
-        {/* Points Earned */}
+        {/* Điểm đạt được */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Points Earned</p>
+            <p className="text-xl font-semibold text-gray-700">Điểm đạt được</p>
             <p className="text-lg font-bold text-green-600">{correctAnswers * 4}</p>
           </div>
           <FaTrophy className="text-yellow-500 text-3xl" />
         </div>
 
-        {/* Correct Answers */}
+        {/* Số câu trả lời đúng */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Correct Answers</p>
+            <p className="text-xl font-semibold text-gray-700">Trả lời đúng</p>
             <p className="text-lg font-bold text-green-600">{correctAnswers}</p>
           </div>
           <FaCheckCircle className="text-green-500 text-3xl" />
         </div>
 
-        {/* Wrong Answers */}
+        {/* Số câu trả lời sai */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Wrong Answers</p>
+            <p className="text-xl font-semibold text-gray-700">Trả lời sai</p>
             <p className="text-lg font-bold text-red-600">{wrongAnswers}</p>
           </div>
           <FaTimesCircle className="text-red-500 text-3xl" />
         </div>
 
-        {/* Unattempted Questions */}
+        {/* Số câu chưa trả lời / Hết giờ */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Unattempted Questions</p>
+            <p className="text-xl font-semibold text-gray-700">Chưa làm / Hết giờ</p>
             <p className="text-lg font-bold text-yellow-600">{unattemptedQuestions}</p>
           </div>
           <FaQuestionCircle className="text-yellow-500 text-3xl" />
         </div>
 
-        {/* Percentage */}
+        {/* Tỷ lệ chính xác */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Percentage</p>
+            <p className="text-xl font-semibold text-gray-700">Tỷ lệ chính xác</p>
             <p className="text-lg font-bold text-blue-600">{percentage}%</p>
           </div>
           <FaPercentage className="text-blue-500 text-3xl" />
         </div>
 
-        {/* Total Time Spent */}
+        {/* Tổng thời gian làm bài */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Total Time Spent</p>
-            <p className="text-lg font-bold text-purple-600">{timeSpent.toFixed(2)}s</p>
+            <p className="text-xl font-semibold text-gray-700">Tổng thời gian</p>
+            <p className="text-lg font-bold text-purple-600">{timeSpent.toFixed(2)} giây</p>
           </div>
           <FaClock className="text-purple-500 text-3xl" />
         </div>
 
-        {/* Avg Time Per Question */}
+        {/* Thời gian trung bình mỗi câu */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between hover:shadow-lg transition-shadow duration-300">
           <div>
-            <p className="text-xl font-semibold">Avg Time/Question</p>
-            <p className="text-lg font-bold text-indigo-600">{averageTimePerQuestion}s</p>
+            <p className="text-xl font-semibold text-gray-700">T.gian trung bình/Câu</p>
+            <p className="text-lg font-bold text-indigo-600">{averageTimePerQuestion} giây</p>
           </div>
           <FaStopwatch className="text-indigo-500 text-3xl" />
         </div>
 
-        {/* Final Score */}
+        {/* Đánh giá chung */}
         <div className="p-5 bg-white shadow-md rounded-lg flex items-center justify-between col-span-1 md:col-span-3 text-center hover:shadow-lg transition-shadow duration-300">
-          <p className="text-xl font-semibold w-full">
-            You scored {correctAnswers * 4} out of {totalQuestions * 4} points!
+          <p className="text-xl font-bold w-full text-blue-600">
+            Bạn đã đạt được {correctAnswers * 4} trên tổng số {totalQuestions * 4} điểm!
           </p>
         </div>
       </div>
