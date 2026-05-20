@@ -42,9 +42,14 @@ const Quiz = ({ params }) => {
   const [unattemptedQuestions, setUnattemptedQuestions] = useState(0);
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
   const [timePerQuestion, setTimePerQuestion] = useState(0);
+  const [autoNextCountdown, setAutoNextCountdown] = useState(null);
+  
+  // Lưu trữ trạng thái từng câu hỏi để hỗ trợ Quay lại (Back)
+  const [quizProgress, setQuizProgress] = useState({});
 
   // Ref quản lý timer tự nhảy câu hỏi
   const autoNextTimerRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
 
   // 1. Tải ngân hàng câu hỏi gốc khi mount
   useEffect(() => {
@@ -107,37 +112,101 @@ const Quiz = ({ params }) => {
     setSelectedOption(option);
     setIsAnswered(true);
     setTotalTimeSpent(totalTimeSpent + timePerQuestion);
+    
     const isCorrect = option === questions[currentQuestionIndex].answer;
-    if (isCorrect) {
-      setPoints(points + 4); 
-      setCorrectAnswers(correctAnswers + 1);
-      const timer = setTimeout(() => {
-        handleNext();
-      }, 2000);
-      autoNextTimerRef.current = timer;
-    } else {
-      setWrongAnswers(wrongAnswers + 1);
+    
+    // Lưu vào tiến trình để hỗ trợ Quay lại (Back)
+    const isAlreadyAnswered = quizProgress[currentQuestionIndex]?.isAnswered;
+    const newProgress = { ...quizProgress };
+    newProgress[currentQuestionIndex] = {
+      selectedOption: option,
+      isAnswered: true,
+      isCorrect: isCorrect,
+      timeSpent: timePerQuestion,
+      isSkipped: false
+    };
+    setQuizProgress(newProgress);
+
+    // Chỉ tính điểm và thống kê nếu câu này chưa được trả lời trước đó
+    if (!isAlreadyAnswered) {
+      if (isCorrect) {
+        setPoints(points + 4); 
+        setCorrectAnswers(correctAnswers + 1);
+        
+        // Khởi tạo đếm ngược 3 giây
+        setAutoNextCountdown(3);
+        
+        const timer = setTimeout(() => {
+          handleNext();
+        }, 3000);
+        autoNextTimerRef.current = timer;
+
+        // Interval cập nhật UI mỗi giây
+        countdownIntervalRef.current = setInterval(() => {
+          setAutoNextCountdown(prev => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+      } else {
+        setWrongAnswers(wrongAnswers + 1);
+      }
     }
   };
 
-  const handleNext = () => {
+  const cancelAutoNext = () => {
     if (autoNextTimerRef.current) {
       clearTimeout(autoNextTimerRef.current);
       autoNextTimerRef.current = null;
     }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    setAutoNextCountdown(null);
+  };
+
+  const handleNext = () => {
+    // Nếu đang trong quá trình đếm ngược, việc bấm nút sẽ DỪNG đếm ngược (theo yêu cầu mới)
+    if (autoNextCountdown !== null) {
+      cancelAutoNext();
+      return;
+    }
+
+    // Dọn dẹp timer nếu có (phòng trường hợp)
+    cancelAutoNext();
+
     let nextUnattempted = unattemptedQuestions;
     let nextTimeSpent = totalTimeSpent;
-    if (!isAnswered) {
+    
+    // Nếu chưa trả lời và chưa từng đánh dấu bỏ qua trước đó
+    if (!isAnswered && !quizProgress[currentQuestionIndex]?.isSkipped) {
       nextUnattempted += 1;
       nextTimeSpent += timePerQuestion;
       setUnattemptedQuestions(nextUnattempted);
       setTotalTimeSpent(nextTimeSpent);
+      
+      // Đánh dấu là đã bỏ qua trong tiến trình
+      const newProgress = { ...quizProgress };
+      newProgress[currentQuestionIndex] = {
+        isAnswered: false,
+        isSkipped: true,
+        timeSpent: timePerQuestion
+      };
+      setQuizProgress(newProgress);
     }
+
     const nextQuestion = currentQuestionIndex + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestionIndex(nextQuestion);
-      setSelectedOption(null);
-      setIsAnswered(false);
+      
+      // Khôi phục trạng thái nếu đã làm câu này rồi (hỗ trợ Back/Next)
+      const savedState = quizProgress[nextQuestion];
+      if (savedState) {
+        setSelectedOption(savedState.selectedOption);
+        setIsAnswered(savedState.isAnswered);
+      } else {
+        setSelectedOption(null);
+        setIsAnswered(false);
+      }
+      
       setTimePerQuestion(0);
     } else {
       saveResultToHistory(nextUnattempted, nextTimeSpent);
@@ -145,17 +214,48 @@ const Quiz = ({ params }) => {
     }
   };
 
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      cancelAutoNext();
+      const prevIndex = currentQuestionIndex - 1;
+      setCurrentQuestionIndex(prevIndex);
+      
+      // Khôi phục trạng thái câu trước
+      const savedState = quizProgress[prevIndex];
+      if (savedState) {
+        setSelectedOption(savedState.selectedOption);
+        setIsAnswered(savedState.isAnswered);
+      } else {
+        setSelectedOption(null);
+        setIsAnswered(false);
+      }
+      
+      setTimePerQuestion(0);
+    }
+  };
+
   const handleTimeUp = () => {
     setIsAnswered(true);
+    cancelAutoNext();
+
     const nextUnattempted = unattemptedQuestions + 1;
-    const nextTimeSpent = totalTimeSpent + 30;
+    const nextTimeSpent = totalTimeSpent + 60;
     setUnattemptedQuestions(nextUnattempted);
     setTotalTimeSpent(nextTimeSpent);
     const nextQuestion = currentQuestionIndex + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestionIndex(nextQuestion);
-      setSelectedOption(null);
-      setIsAnswered(false);
+      
+      // Khôi phục trạng thái nếu đã làm câu này rồi (hỗ trợ Back/Next)
+      const savedState = quizProgress[nextQuestion];
+      if (savedState) {
+        setSelectedOption(savedState.selectedOption);
+        setIsAnswered(savedState.isAnswered);
+      } else {
+        setSelectedOption(null);
+        setIsAnswered(false);
+      }
+      
       setTimePerQuestion(0);
     } else {
       saveResultToHistory(nextUnattempted, nextTimeSpent);
@@ -169,7 +269,7 @@ const Quiz = ({ params }) => {
       username: user.username,
       subject: decodeURIComponent(subject || ""),
       date: new Date().toISOString(),
-      score: points + (overrideUnattempted !== undefined ? 0 : 0), // points is already updated in handleAnswer
+      score: points, // points is already updated in handleAnswer
       totalQuestions: questions.length,
       correctAnswers: correctAnswers,
       wrongAnswers: wrongAnswers,
@@ -182,10 +282,8 @@ const Quiz = ({ params }) => {
   };
 
   const handleForceFinish = () => {
-    if (autoNextTimerRef.current) {
-      clearTimeout(autoNextTimerRef.current);
-      autoNextTimerRef.current = null;
-    }
+    cancelAutoNext();
+
     const remainingCount = questions.length - currentQuestionIndex - (isAnswered ? 1 : 0);
     const finalUnattempted = unattemptedQuestions + remainingCount;
     const finalTime = totalTimeSpent + (isAnswered ? 0 : timePerQuestion);
@@ -201,6 +299,17 @@ const Quiz = ({ params }) => {
   };
 
   const handleContainerClick = (e) => {
+    // 1. Nếu đang đếm ngược tự động chuyển câu -> Click để DỪNG
+    if (autoNextCountdown !== null) {
+      // Nếu click vào chính cái nút "Đang chuyển..." thì để sự kiện onClick của nút xử lý (cũng là cancel)
+      if (e.target.closest("button") && e.target.closest("button").innerText.includes("Đang chuyển")) {
+        return;
+      }
+      cancelAutoNext();
+      return;
+    }
+
+    // 2. Nếu trả lời SAI -> Click để chuyển câu tiếp theo nhanh
     if (isAnswered && selectedOption !== questions[currentQuestionIndex]?.answer) {
       if (e.target.closest("button") && e.target.closest("button").innerText.includes("Câu hỏi tiếp theo")) {
         return;
@@ -379,13 +488,48 @@ const Quiz = ({ params }) => {
             ))}
           </div>
 
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 select-none">
-            <button onClick={handleForceFinish} className="py-4 px-6 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-2xl font-black text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95">
-              Kết thúc ôn tập
-            </button>
-            <button onClick={handleNext} className="py-4 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl font-black text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95">
-              {isAnswered ? (currentQuestionIndex === questions.length - 1 ? "Nộp bài và xem kết quả" : "Câu hỏi tiếp theo") : (currentQuestionIndex === questions.length - 1 ? "Bỏ qua & Xem kết quả" : "Bỏ qua & Câu tiếp theo")}
-            </button>
+          <div className="mt-8 flex flex-col gap-4 select-none">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button 
+                onClick={handlePrevious} 
+                disabled={currentQuestionIndex === 0}
+                className={`py-4 px-6 rounded-2xl font-black text-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${
+                  currentQuestionIndex === 0 
+                  ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
+                  : "bg-slate-700 hover:bg-slate-800 text-white cursor-pointer"
+                }`}
+              >
+                Quay lại câu trước
+              </button>
+              <button onClick={handleForceFinish} className="py-4 px-6 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-2xl font-black text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer">
+                Kết thúc ôn tập
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button onClick={handleNext} className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl font-black text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer">
+                {isAnswered 
+                  ? (currentQuestionIndex === questions.length - 1 
+                      ? "Nộp bài và xem kết quả" 
+                      : (autoNextCountdown !== null ? `Đang chuyển câu tiếp theo (${autoNextCountdown}s)` : "Câu hỏi tiếp theo")
+                    )
+                  : (currentQuestionIndex === questions.length - 1 ? "Bỏ qua & Xem kết quả" : "Bỏ qua & Câu tiếp theo")
+                }
+              </button>
+              
+              {/* Hướng dẫn khi trả lời đúng (đang đếm ngược) */}
+              {autoNextCountdown !== null && (
+                <p className="text-center text-[11px] text-blue-500 font-bold animate-pulse">
+                  * Click vào vùng trống hoặc Nút trên để dừng chuyển trang tự động
+                </p>
+              )}
+
+              {/* Hướng dẫn khi trả lời sai */}
+              {isAnswered && selectedOption !== questions[currentQuestionIndex].answer && (
+                <p className="text-center text-[11px] text-red-500 font-bold animate-pulse">
+                  * Trả lời sai. Click vùng trống hoặc nút để tiếp tục
+                </p>
+              )}
+            </div>
           </div>
         </div>
       ) : (
