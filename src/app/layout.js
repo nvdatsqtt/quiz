@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PointsProvider } from "@/context/PointsContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 
 const geistSans = localFont({
@@ -28,12 +29,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PointsProvider>
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <SpeedInsights />
-          <Footer />
-        </PointsProvider>
+        <AuthProvider>
+          <PointsProvider>
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <SpeedInsights />
+            <Footer />
+          </PointsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

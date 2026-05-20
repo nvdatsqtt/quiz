@@ -1,0 +1,1 @@
+Load all the rules in .agents/rules folder, then follow it strictly.
