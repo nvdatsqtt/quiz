@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --max-width: 1920px; 
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: var(--max-width); /* Apply max width to the body */
+  margin: 0 auto; /* Center the body */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
