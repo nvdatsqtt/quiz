@@ -69,44 +69,6 @@ const Quiz = ({ params }) => {
     }
   }, [subject]);
 
-  if (authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Login />;
-  }
-
-  const shuffleQuestions = (array, count) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled.slice(0, count);
-  };
-
-  const handleStartQuiz = () => {
-    if (rawQuestions.length === 0) return;
-    const selectedQuestions = shuffleQuestions(rawQuestions, selectedQuestionCount);
-    setQuestions(selectedQuestions);
-    setCurrentQuestionIndex(0);
-    setSelectedOption(null);
-    setIsAnswered(false);
-    setShowResults(false);
-    setCorrectAnswers(0);
-    setWrongAnswers(0);
-    setUnattemptedQuestions(0);
-    setTotalTimeSpent(0);
-    setTimePerQuestion(0);
-    setPoints(0);
-    setIsConfigured(true);
-  };
-
   const cancelAutoNext = useCallback(() => {
     if (autoNextTimerRef.current) {
       clearTimeout(autoNextTimerRef.current);
@@ -120,12 +82,14 @@ const Quiz = ({ params }) => {
   }, []);
 
   const saveResultToHistory = useCallback((overrideUnattempted, overrideTimeSpent) => {
+    if (!user) return; // Bảo vệ nếu user chưa được tải
+    
     const record = {
       id: Date.now().toString(),
       username: user.username,
       subject: decodeURIComponent(subject || ""),
       date: new Date().toISOString(),
-      score: points, // points is already updated in handleAnswer
+      score: points, 
       totalQuestions: questions.length,
       correctAnswers: correctAnswers,
       wrongAnswers: wrongAnswers,
@@ -135,73 +99,27 @@ const Quiz = ({ params }) => {
     };
     const localHistory = JSON.parse(localStorage.getItem("quiz_history") || "[]");
     localStorage.setItem("quiz_history", JSON.stringify([record, ...localHistory]));
-  }, [user.username, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
+  }, [user?.username, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
 
-  const handleAnswer = useCallback((option) => {
-    if (isAnswered) return;
-    setSelectedOption(option);
-    setIsAnswered(true);
-    setTotalTimeSpent(totalTimeSpent + timePerQuestion);
-    
-    const isCorrect = option === questions[currentQuestionIndex].answer;
-    
-    // Lưu vào tiến trình để hỗ trợ Quay lại (Back)
-    const isAlreadyAnswered = quizProgress[currentQuestionIndex]?.isAnswered;
-    const newProgress = { ...quizProgress };
-    newProgress[currentQuestionIndex] = {
-      selectedOption: option,
-      isAnswered: true,
-      isCorrect: isCorrect,
-      timeSpent: timePerQuestion,
-      isSkipped: false
-    };
-    setQuizProgress(newProgress);
-
-    // Chỉ tính điểm và thống kê nếu câu này chưa được trả lời trước đó
-    if (!isAlreadyAnswered) {
-      if (isCorrect) {
-        setPoints(points + 4); 
-        setCorrectAnswers(correctAnswers + 1);
-        
-        // Khởi tạo đếm ngược 3 giây
-        setAutoNextCountdown(3);
-        
-        const timer = setTimeout(() => {
-          handleNext();
-        }, 3000);
-        autoNextTimerRef.current = timer;
-
-        // Interval cập nhật UI mỗi giây
-        countdownIntervalRef.current = setInterval(() => {
-          setAutoNextCountdown(prev => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
-      } else {
-        setWrongAnswers(wrongAnswers + 1);
-      }
-    }
-  }, [isAnswered, totalTimeSpent, timePerQuestion, questions, currentQuestionIndex, quizProgress, points, setPoints, correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers]);
-
+  // Khai báo handleNext trước để handleAnswer có thể sử dụng (đã bọc useCallback)
   const handleNext = useCallback(() => {
-    // Nếu đang trong quá trình đếm ngược, việc bấm nút sẽ DỪNG đếm ngược (theo yêu cầu mới)
+    // Nếu đang trong quá trình đếm ngược, việc bấm nút sẽ DỪNG đếm ngược
     if (autoNextCountdown !== null) {
       cancelAutoNext();
       return;
     }
 
-    // Dọn dẹp timer nếu có (phòng trường hợp)
     cancelAutoNext();
 
     let nextUnattempted = unattemptedQuestions;
     let nextTimeSpent = totalTimeSpent;
     
-    // Nếu chưa trả lời và chưa từng đánh dấu bỏ qua trước đó
     if (!isAnswered && !quizProgress[currentQuestionIndex]?.isSkipped) {
       nextUnattempted += 1;
       nextTimeSpent += timePerQuestion;
       setUnattemptedQuestions(nextUnattempted);
       setTotalTimeSpent(nextTimeSpent);
       
-      // Đánh dấu là đã bỏ qua trong tiến trình
       const newProgress = { ...quizProgress };
       newProgress[currentQuestionIndex] = {
         isAnswered: false,
@@ -215,7 +133,6 @@ const Quiz = ({ params }) => {
     if (nextQuestion < questions.length) {
       setCurrentQuestionIndex(nextQuestion);
       
-      // Khôi phục trạng thái nếu đã làm câu này rồi (hỗ trợ Back/Next)
       const savedState = quizProgress[nextQuestion];
       if (savedState) {
         setSelectedOption(savedState.selectedOption);
@@ -232,13 +149,52 @@ const Quiz = ({ params }) => {
     }
   }, [autoNextCountdown, cancelAutoNext, unattemptedQuestions, totalTimeSpent, isAnswered, quizProgress, currentQuestionIndex, timePerQuestion, questions.length, saveResultToHistory]);
 
+  const handleAnswer = useCallback((option) => {
+    if (isAnswered) return;
+    setSelectedOption(option);
+    setIsAnswered(true);
+    setTotalTimeSpent(totalTimeSpent + timePerQuestion);
+    
+    const isCorrect = option === questions[currentQuestionIndex].answer;
+    
+    const isAlreadyAnswered = quizProgress[currentQuestionIndex]?.isAnswered;
+    const newProgress = { ...quizProgress };
+    newProgress[currentQuestionIndex] = {
+      selectedOption: option,
+      isAnswered: true,
+      isCorrect: isCorrect,
+      timeSpent: timePerQuestion,
+      isSkipped: false
+    };
+    setQuizProgress(newProgress);
+
+    if (!isAlreadyAnswered) {
+      if (isCorrect) {
+        setPoints(points + 4); 
+        setCorrectAnswers(correctAnswers + 1);
+        
+        setAutoNextCountdown(3);
+        
+        const timer = setTimeout(() => {
+          handleNext();
+        }, 3000);
+        autoNextTimerRef.current = timer;
+
+        countdownIntervalRef.current = setInterval(() => {
+          setAutoNextCountdown(prev => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+      } else {
+        setWrongAnswers(wrongAnswers + 1);
+      }
+    }
+  }, [isAnswered, totalTimeSpent, timePerQuestion, questions, currentQuestionIndex, quizProgress, points, setPoints, correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers, handleNext]);
+
   const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
       cancelAutoNext();
       const prevIndex = currentQuestionIndex - 1;
       setCurrentQuestionIndex(prevIndex);
       
-      // Khôi phục trạng thái câu trước
       const savedState = quizProgress[prevIndex];
       if (savedState) {
         setSelectedOption(savedState.selectedOption);
@@ -272,24 +228,21 @@ const Quiz = ({ params }) => {
   // 2. Xử lý phím tắt bàn phím
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Nếu đã kết thúc hoặc chưa cấu hình thì không nhận phím
       if (showResults || !isConfigured) return;
 
       const key = e.key.toLowerCase();
       
-      // 1, 2, 3, 4 hoặc a, b, c, d để chọn đáp án
       const options = questions[currentQuestionIndex]?.options || [];
       if (['1', '2', '3', '4'].includes(key)) {
         const index = parseInt(key) - 1;
         if (options[index]) handleAnswer(options[index]);
       } else if (['a', 'b', 'c', 'd'].includes(key)) {
-        const index = key.charCodeAt(0) - 97; // a=0, b=1...
+        const index = key.charCodeAt(0) - 97; 
         if (options[index]) handleAnswer(options[index]);
       }
       
-      // Space để Tiếp tục/Bỏ qua/Dừng đếm ngược
       if (e.code === 'Space' || e.key === ' ') {
-        e.preventDefault(); // Tránh cuộn trang
+        e.preventDefault(); 
         if (autoNextCountdown !== null) {
           cancelAutoNext();
         } else {
@@ -297,12 +250,10 @@ const Quiz = ({ params }) => {
         }
       }
 
-      // P để quay lại
       if (key === 'p') {
         handlePrevious();
       }
 
-      // N để tới câu tiếp theo
       if (key === 'n') {
         handleNext();
       }
@@ -313,13 +264,11 @@ const Quiz = ({ params }) => {
   }, [
     isConfigured, showResults, currentQuestionIndex, questions, 
     autoNextCountdown, isAnswered, selectedOption, 
-    handleAnswer, handleNext, handlePrevious, cancelAutoNext // Đầy đủ dependency
+    handleAnswer, handleNext, handlePrevious, cancelAutoNext
   ]);
 
   const handleContainerClick = (e) => {
-    // 1. Nếu đang đếm ngược tự động chuyển câu -> Click để DỪNG
     if (autoNextCountdown !== null) {
-      // Nếu click vào chính cái nút "Đang chuyển..." thì để sự kiện onClick của nút xử lý (cũng là cancel)
       if (e.target.closest("button") && e.target.closest("button").innerText.includes("Đang chuyển")) {
         return;
       }
@@ -327,7 +276,6 @@ const Quiz = ({ params }) => {
       return;
     }
 
-    // 2. Nếu trả lời SAI -> Click để chuyển câu tiếp theo nhanh
     if (isAnswered && selectedOption !== questions[currentQuestionIndex]?.answer) {
       if (e.target.closest("button") && e.target.closest("button").innerText.includes("Câu hỏi tiếp theo")) {
         return;
@@ -340,6 +288,54 @@ const Quiz = ({ params }) => {
   const averageTimePerQuestion = questions.length > 0 ? (totalTimeSpent / questions.length).toFixed(1) : "0.0";
   const rawQuestionText = questions[currentQuestionIndex]?.question || "";
   const optionPrefixes = ["A", "B", "C", "D", "E", "F"];
+
+  // Logic xử lý Shuffle phụ trợ
+  const shuffleQuestions = (array, count) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, count);
+  };
+
+  const handleStartQuiz = () => {
+    if (rawQuestions.length === 0) return;
+    const selectedQuestions = shuffleQuestions(rawQuestions, selectedQuestionCount);
+    
+    // Xáo trộn ngẫu nhiên thứ tự các đáp án cho từng câu hỏi
+    const questionsWithShuffledOptions = selectedQuestions.map(q => ({
+      ...q,
+      options: shuffleQuestions(q.options, q.options.length)
+    }));
+    
+    setQuestions(questionsWithShuffledOptions);
+    setCurrentQuestionIndex(0);
+    setSelectedOption(null);
+    setIsAnswered(false);
+    setShowResults(false);
+    setCorrectAnswers(0);
+    setWrongAnswers(0);
+    setUnattemptedQuestions(0);
+    setTotalTimeSpent(0);
+    setTimePerQuestion(0);
+    setPoints(0);
+    setIsConfigured(true);
+  };
+
+  // --- CÁC RETURN CÓ ĐIỀU KIỆN PHẢI ĐẶT SAU TẤT CẢ CÁC HOOKS ---
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
 
   if (rawQuestions.length === 0) {
     return (
