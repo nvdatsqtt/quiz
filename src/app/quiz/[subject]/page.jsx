@@ -81,7 +81,7 @@ const Quiz = ({ params }) => {
     setAutoNextCountdown(null);
   }, []);
 
-  const saveResultToHistory = useCallback((overrideUnattempted, overrideTimeSpent) => {
+  const saveResultToHistory = useCallback(async (overrideUnattempted, overrideTimeSpent) => {
     if (!user) return; // Bảo vệ nếu user chưa được tải
     
     const record = {
@@ -97,12 +97,27 @@ const Quiz = ({ params }) => {
       timeSpent: overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent,
       averageTime: ((overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent) / questions.length).toFixed(1)
     };
-    const localHistory = JSON.parse(localStorage.getItem("quiz_history") || "[]");
-    localStorage.setItem("quiz_history", JSON.stringify([record, ...localHistory]));
-  }, [user?.username, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
+
+    try {
+      // Gửi yêu cầu chèn kết quả thi lên Turso Database qua API Route
+      const res = await fetch("/api/history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(record),
+      });
+
+      if (!res.ok) {
+        console.error("[Turso Database]: Gặp lỗi khi lưu kết quả thi lên Server.");
+      }
+    } catch (err) {
+      console.error("[Turso Database Error]: Lỗi mạng khi cố gắng lưu lịch sử thi:", err);
+    }
+  }, [user, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
 
   // Khai báo handleNext trước để handleAnswer có thể sử dụng (đã bọc useCallback)
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     // Nếu đang trong quá trình đếm ngược, việc bấm nút sẽ DỪNG đếm ngược
     if (autoNextCountdown !== null) {
       cancelAutoNext();
@@ -144,7 +159,8 @@ const Quiz = ({ params }) => {
       
       setTimePerQuestion(0);
     } else {
-      saveResultToHistory(nextUnattempted, nextTimeSpent);
+      // Đợi lưu lịch sử hoàn thành để tránh race condition khi component Results render HistorySection
+      await saveResultToHistory(nextUnattempted, nextTimeSpent);
       setShowResults(true);
     }
   }, [autoNextCountdown, cancelAutoNext, unattemptedQuestions, totalTimeSpent, isAnswered, quizProgress, currentQuestionIndex, timePerQuestion, questions.length, saveResultToHistory]);
@@ -208,7 +224,7 @@ const Quiz = ({ params }) => {
     }
   }, [currentQuestionIndex, cancelAutoNext, quizProgress]);
 
-  const handleForceFinish = () => {
+  const handleForceFinish = async () => {
     cancelAutoNext();
 
     const remainingCount = questions.length - currentQuestionIndex - (isAnswered ? 1 : 0);
@@ -216,7 +232,8 @@ const Quiz = ({ params }) => {
     const finalTime = totalTimeSpent + (isAnswered ? 0 : timePerQuestion);
     setUnattemptedQuestions(finalUnattempted);
     setTotalTimeSpent(finalTime);
-    saveResultToHistory(finalUnattempted, finalTime);
+    // Đợi lưu lịch sử hoàn thành để tránh race condition
+    await saveResultToHistory(finalUnattempted, finalTime);
     setShowResults(true);
   };
 

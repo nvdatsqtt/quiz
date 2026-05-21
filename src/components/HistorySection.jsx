@@ -15,14 +15,28 @@ const HistorySection = ({ currentUser, subjectFilter = null }) => {
   const [history, setHistory] = useState([]);
   const [displayHistory, setDisplayHistory] = useState([]);
   const [userFilter, setUserFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  // Hàm tải dữ liệu lịch sử thi từ API (Turso Database)
+  const fetchHistory = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/history");
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      } else {
+        console.error("[Turso Database Error]: Lỗi tải lịch sử từ API");
+      }
+    } catch (err) {
+      console.error("[Turso Database Error]: Lỗi kết nối mạng khi tải lịch sử:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    try {
-      const localHistory = JSON.parse(localStorage.getItem("quiz_history") || "[]");
-      setHistory(localHistory);
-    } catch (err) {
-      console.error("Lỗi khi đọc lịch sử ôn tập từ localStorage:", err);
-    }
+    fetchHistory();
   }, []);
 
   useEffect(() => {
@@ -47,10 +61,21 @@ const HistorySection = ({ currentUser, subjectFilter = null }) => {
 
   const uniqueUsers = Array.from(new Set(history.map(h => h.username)));
 
-  const clearHistory = () => {
+  // Gửi yêu cầu DELETE đến máy chủ để xóa toàn bộ lịch sử thi (Chỉ Admin)
+  const clearHistory = async () => {
     if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử không?")) {
-      localStorage.removeItem("quiz_history");
-      setHistory([]);
+      try {
+        const res = await fetch("/api/history", {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          setHistory([]);
+        } else {
+          alert("Gặp lỗi từ máy chủ khi cố gắng xóa sạch lịch sử thi.");
+        }
+      } catch (err) {
+        console.error("[Turso Database Error]: Lỗi mạng khi xóa lịch sử:", err);
+      }
     }
   };
 
@@ -95,7 +120,12 @@ const HistorySection = ({ currentUser, subjectFilter = null }) => {
         </div>
       </div>
 
-      {displayHistory.length === 0 ? (
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-center font-medium">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4 mx-auto"></div>
+          <p className="animate-pulse">Đang tải lịch sử ôn tập từ database...</p>
+        </div>
+      ) : displayHistory.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-center font-medium">
           <FaTrophy className="text-5xl text-slate-200 mb-3 animate-pulse" />
           <p>Không tìm thấy lịch sử ôn tập nào.</p>
