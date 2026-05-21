@@ -17,21 +17,30 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (username, password) => {
-    // Danh sách người dùng cố định
-    const users = {
-      'Admin': '123456@',
-      'User2': '123456a',
-      'User3': '123456a'
-    };
+  const login = async (username, password) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (users[username] && users[username] === password) {
-      const userData = { username, isAdmin: username === 'Admin' };
-      setUser(userData);
-      localStorage.setItem('quiz_logged_in_user', JSON.stringify(userData));
-      return { success: true };
+      const data = await response.json();
+
+      if (response.ok) {
+        const userData = { username: data.username, isAdmin: data.role === 'Admin', role: data.role };
+        setUser(userData);
+        localStorage.setItem('quiz_logged_in_user', JSON.stringify(userData));
+        return { success: true };
+      } else {
+        return { success: false, message: data.error || 'Đăng nhập thất bại' };
+      }
+    } catch (error) {
+      console.error('Lỗi khi gọi API đăng nhập:', error);
+      return { success: false, message: 'Lỗi kết nối máy chủ' };
     }
-    return { success: false, message: 'Tên đăng nhập hoặc mật khẩu không chính xác' };
   };
 
   const logout = () => {

@@ -5,7 +5,7 @@
  * Mô tả: Thành phần Header hiển thị thanh điều hướng đầu trang, thông tin người dùng và số điểm tích lũy.
  */
 
-import { FaCoins, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaCoins, FaSignOutAlt, FaUserCircle, FaShieldAlt } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import { usePoints } from "@/context/PointsContext";
@@ -44,6 +44,15 @@ const Header = () => {
         {/* Thông tin người dùng và Đăng xuất */}
         {user && (
           <div className="flex items-center gap-3 border-l border-gray-700 pl-4 sm:pl-8">
+            {user.isAdmin && (
+              <Link 
+                href="/admin/hints"
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-900/50 hover:bg-blue-800/80 text-blue-300 border border-blue-800 rounded-lg text-sm font-bold transition mr-2"
+                title="Duyệt Gợi Ý"
+              >
+                <FaShieldAlt /> Duyệt Gợi ý
+              </Link>
+            )}
             <div className="flex flex-col items-end hidden md:flex">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Học viên</span>
               <span className="text-sm font-black text-blue-300">{user.username}</span>

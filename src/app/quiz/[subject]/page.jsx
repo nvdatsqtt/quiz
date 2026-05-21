@@ -19,7 +19,6 @@ import Results from "@/components/Results";
 import Login from "@/components/Login";
 import HistorySection from "@/components/HistorySection";
 import { FaPen, FaCheckCircle, FaTimesCircle, FaUser, FaSlidersH, FaPlay, FaHistory, FaBookOpen } from "react-icons/fa";
-import questionsData from "../../../../public/data/questions.json";
 
 const Quiz = ({ params }) => {
   const { subject } = params;
@@ -38,9 +37,52 @@ const Quiz = ({ params }) => {
 
   // State làm bài trắc nghiệm
   const [questions, setQuestions] = useState([]);
+  const [editingQuestion, setEditingQuestion] = useState(null); // Quản lý Inline-edit
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  
+  // State quản lý Gợi ý (Hint)
+  const [showHint, setShowHint] = useState(false);
+  const [showHintForm, setShowHintForm] = useState(false);
+  const [hintInput, setHintInput] = useState("");
+  const [isSubmittingHint, setIsSubmittingHint] = useState(false);
+
+  useEffect(() => {
+    setShowHint(false);
+    setShowHintForm(false);
+    setHintInput("");
+  }, [currentQuestionIndex]);
+
+  const handleSubmitHint = async () => {
+    if (!hintInput.trim()) return;
+    setIsSubmittingHint(true);
+    try {
+      const q = questions[currentQuestionIndex];
+      const res = await fetch(`/api/questions/${q.id}/hint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: user.isAdmin ? "Admin" : "User", new_hint: hintInput, username: user.username })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setShowHintForm(false);
+        setHintInput("");
+        if (user.isAdmin || !q.hint_text) {
+           setQuestions(prev => prev.map((item, idx) => idx === currentQuestionIndex ? {...item, hint_text: hintInput} : item));
+           setRawQuestions(prev => prev.map((item) => item.id === q.id ? {...item, hint_text: hintInput} : item));
+        }
+      } else {
+        alert(data.error);
+      }
+    } catch(e) {
+      console.error(e);
+      alert("Lỗi kết nối khi gửi gợi ý");
+    } finally {
+      setIsSubmittingHint(false);
+    }
+  };
   const [showResults, setShowResults] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [wrongAnswers, setWrongAnswers] = useState(0);
@@ -88,20 +130,28 @@ const Quiz = ({ params }) => {
 
   // 2. Tải ngân hàng câu hỏi gốc khi mount
   useEffect(() => {
-    try {
-      const decodedSubject = decodeURIComponent(subject || "").toLowerCase();
-      const subjectData = questionsData.subjects.find(
-        (s) => s.name.toLowerCase() === decodedSubject
-      );
+    const fetchQuestions = async () => {
+      try {
+        const decodedSubject = decodeURIComponent(subject || "").toLowerCase();
+        
+        const res = await fetch('/api/questions');
+        if (!res.ok) throw new Error("Lỗi mạng khi lấy câu hỏi");
+        const data = await res.json();
+        
+        const subjectData = data.subjects?.find(
+          (s) => s.name.toLowerCase() === decodedSubject
+        );
 
-      if (subjectData) {
-        setRawQuestions(subjectData.questions || []);
-        const count = subjectData.questions.length;
-        setSelectedQuestionCount(count > 20 ? 20 : count);
+        if (subjectData) {
+          setRawQuestions(subjectData.questions || []);
+          const count = subjectData.questions.length;
+          setSelectedQuestionCount(count > 20 ? 20 : count);
+        }
+      } catch (err) {
+        console.error("Lỗi tải trang cấu hình:", err);
       }
-    } catch (err) {
-      console.error("Lỗi tải trang cấu hình:", err);
-    }
+    };
+    fetchQuestions();
   }, [subject]);
 
   // 3. Tự động tải lại thống kê câu hỏi mỗi khi người dùng quay lại màn hình Setup (Cấu hình)
@@ -110,6 +160,48 @@ const Quiz = ({ params }) => {
       fetchQuestionStats();
     }
   }, [user, isConfigured, fetchQuestionStats]);
+
+  // --- Admin Handlers ---
+  const handleDeleteQuestion = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa câu hỏi này không?")) return;
+    try {
+      const res = await fetch(`/api/questions/${id}?role=Admin`, { method: "DELETE" });
+      if (res.ok) {
+        setQuestions((prev) => prev.filter((q) => q.id !== id));
+        setRawQuestions((prev) => prev.filter((q) => q.id !== id));
+      } else {
+        alert("Xóa thất bại!");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Lỗi khi xóa câu hỏi.");
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingQuestion) return;
+    try {
+      const res = await fetch(`/api/questions/${editingQuestion.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: "Admin", data: editingQuestion }),
+      });
+      if (res.ok) {
+        setQuestions((prev) =>
+          prev.map((q) => (q.id === editingQuestion.id ? { ...q, ...editingQuestion } : q))
+        );
+        setRawQuestions((prev) =>
+          prev.map((q) => (q.id === editingQuestion.id ? { ...q, ...editingQuestion } : q))
+        );
+        setEditingQuestion(null);
+      } else {
+        alert("Cập nhật thất bại!");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Lỗi khi cập nhật câu hỏi.");
+    }
+  };
 
   const cancelAutoNext = useCallback(() => {
     if (autoNextTimerRef.current) {
@@ -743,38 +835,147 @@ const Quiz = ({ params }) => {
             />
           </div>
 
-          <div className="text-left p-5 sm:p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm leading-relaxed mb-6 select-none">
-            <p className="text-lg sm:text-xl leading-relaxed flex flex-wrap items-baseline">
-              <span className="text-black font-black text-2xl mr-2 shrink-0 select-none">Câu {currentQuestionIndex + 1}:</span>
-              <span className="text-blue-900 font-bold">{rawQuestionText}</span>
-            </p>
-          </div>
+          {editingQuestion?.id === questions[currentQuestionIndex]?.id ? (
+            <div className="bg-white p-6 rounded-2xl shadow border border-blue-200 mb-6 relative z-10">
+              <h3 className="font-bold text-lg mb-4 text-blue-800 flex items-center gap-2">
+                <FaPen /> Chỉnh sửa Câu hỏi (Admin)
+              </h3>
+              <div className="space-y-4">
+                <textarea
+                  className="w-full p-3 border rounded-lg bg-slate-50 text-black font-medium focus:ring-2 focus:ring-blue-400 outline-none"
+                  rows="3"
+                  value={editingQuestion.question}
+                  onChange={(e) => setEditingQuestion({...editingQuestion, question: e.target.value})}
+                />
+                {editingQuestion.options.map((opt, i) => (
+                  <div key={i} className="flex gap-3 items-center">
+                    <input
+                      type="radio"
+                      name="correct_answer"
+                      checked={editingQuestion.answer === opt}
+                      onChange={() => setEditingQuestion({...editingQuestion, answer: opt})}
+                      className="w-5 h-5 cursor-pointer accent-blue-600"
+                    />
+                    <input
+                      type="text"
+                      className="flex-1 p-2 border rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-400 outline-none"
+                      value={opt}
+                      onChange={(e) => {
+                        const newOpts = [...editingQuestion.options];
+                        newOpts[i] = e.target.value;
+                        let newAnswer = editingQuestion.answer;
+                        if (editingQuestion.answer === opt) newAnswer = e.target.value;
+                        setEditingQuestion({...editingQuestion, options: newOpts, answer: newAnswer});
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button onClick={handleSaveEdit} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">Lưu thay đổi</button>
+                <button onClick={() => setEditingQuestion(null)} className="px-6 py-2 bg-slate-300 text-slate-800 font-bold rounded-lg hover:bg-slate-400 transition">Hủy</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="text-left p-5 sm:p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm leading-relaxed mb-6 select-none relative group">
+                {user?.isAdmin && (
+                  <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <button onClick={() => setEditingQuestion(questions[currentQuestionIndex])} className="p-2 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition" title="Chỉnh sửa"><FaPen size={14} /></button>
+                    <button onClick={() => handleDeleteQuestion(questions[currentQuestionIndex].id)} className="p-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition" title="Xóa"><FaTimesCircle size={14} /></button>
+                  </div>
+                )}
+                <p className="text-lg sm:text-xl leading-relaxed flex flex-wrap items-baseline">
+                  <span className="text-black font-black text-2xl mr-2 shrink-0 select-none">Câu {currentQuestionIndex + 1}:</span>
+                  <span className="text-blue-900 font-bold">{rawQuestionText}</span>
+                </p>
+              </div>
 
-          <div className="mt-6 space-y-4">
-            {questions[currentQuestionIndex]?.options?.map((option, index) => (
-              <button
-                key={option}
-                onClick={() => handleAnswer(option)}
-                disabled={isAnswered}
-                className={`w-full py-4 px-6 rounded-2xl text-base sm:text-lg font-bold text-left transition-all duration-300 focus:outline-none flex items-center gap-3 border shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
-                    ? "bg-green-600 text-white border-green-600 shadow-green-100"
-                    : isAnswered && option === selectedOption
-                      ? "bg-red-600 text-white border-red-600 shadow-red-100"
-                      : "bg-slate-50 hover:bg-blue-50 hover:border-blue-300 focus:bg-blue-50 text-slate-800 border-slate-200 hover:shadow"
-                  }`}
+              <div className="mt-6 space-y-4">
+                {questions[currentQuestionIndex]?.options?.map((option, index) => (
+                  <button
+                    key={option}
+                    onClick={() => handleAnswer(option)}
+                    disabled={isAnswered}
+                    className={`w-full py-4 px-6 rounded-2xl text-base sm:text-lg font-bold text-left transition-all duration-300 focus:outline-none flex items-center gap-3 border shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
+                        ? "bg-green-600 text-white border-green-600 shadow-green-100"
+                        : isAnswered && option === selectedOption
+                          ? "bg-red-600 text-white border-red-600 shadow-red-100"
+                          : "bg-slate-50 hover:bg-blue-50 hover:border-blue-300 focus:bg-blue-50 text-slate-800 border-slate-200 hover:shadow"
+                      }`}
+                  >
+                    <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
+                        ? "bg-white text-green-600 border-white font-extrabold"
+                        : isAnswered && option === selectedOption
+                          ? "bg-white text-red-600 border-white font-extrabold"
+                          : "bg-white text-blue-600 border-blue-100"
+                      }`}>
+                      {optionPrefixes[index]}
+                    </span>
+                    <span className="flex-1 leading-snug">{option}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {isAnswered && (
+            <div className="mt-4">
+              <button 
+                onClick={() => setShowHint(!showHint)}
+                className="text-blue-600 font-bold hover:underline flex items-center gap-2 transition"
               >
-                <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
-                    ? "bg-white text-green-600 border-white font-extrabold"
-                    : isAnswered && option === selectedOption
-                      ? "bg-white text-red-600 border-white font-extrabold"
-                      : "bg-white text-blue-600 border-blue-100"
-                  }`}>
-                  {optionPrefixes[index]}
-                </span>
-                <span className="flex-1 leading-snug">{option}</span>
+                <FaBookOpen /> {showHint ? "Ẩn gợi ý đáp án" : "Xem gợi ý giải thích đáp án"}
               </button>
-            ))}
-          </div>
+              
+              {showHint && (
+                <div className="mt-3 p-5 bg-blue-50 border border-blue-200 rounded-xl">
+                  {questions[currentQuestionIndex].hint_text ? (
+                    <div>
+                      <p className="text-gray-800 font-medium whitespace-pre-line leading-relaxed">
+                        {questions[currentQuestionIndex].hint_text}
+                      </p>
+                      <button 
+                        onClick={() => setShowHintForm(!showHintForm)}
+                        className="mt-3 text-sm text-blue-700 hover:underline font-bold"
+                      >
+                        Đóng góp gợi ý hay hơn?
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-gray-500 italic mb-2">Câu hỏi này chưa có gợi ý giải thích.</p>
+                      <button 
+                        onClick={() => setShowHintForm(!showHintForm)}
+                        className="text-sm text-blue-700 hover:underline font-bold"
+                      >
+                        Bạn có gợi ý nào không? Hãy đóng góp nhé!
+                      </button>
+                    </div>
+                  )}
+
+                  {showHintForm && (
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <textarea
+                        className="w-full p-3 border rounded-lg bg-white focus:ring-2 focus:ring-blue-400 outline-none text-black"
+                        rows="3"
+                        placeholder="Nhập nội dung giải thích đáp án của bạn..."
+                        value={hintInput}
+                        onChange={(e) => setHintInput(e.target.value)}
+                      />
+                      <button 
+                        onClick={handleSubmitHint}
+                        disabled={isSubmittingHint}
+                        className="mt-2 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                      >
+                        {isSubmittingHint ? "Đang gửi..." : "Gửi đóng góp"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mt-8 flex flex-col gap-4 select-none">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

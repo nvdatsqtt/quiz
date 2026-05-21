@@ -12,8 +12,6 @@ import Login from '@/components/Login';
 import HistorySection from '@/components/HistorySection';
 import { useAuth } from '@/context/AuthContext';
 import Image from "next/image";
-// Import trực tiếp câu hỏi tĩnh từ file JSON để tải ngay lập tức, tránh lỗi mạng ở chế độ dev
-import questionsData from "../../public/data/questions.json";
 
 export default function Home() {
   const [subjects, setSubjects] = useState([]);
@@ -21,19 +19,25 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
 
-  // Tải danh sách các chủ đề trực tiếp từ dữ liệu JSON được import tĩnh
-  const loadSubjects = () => {
+  // Lấy danh sách các chủ đề từ API Turso Database
+  const loadSubjects = async () => {
     setLoading(true);
     setError(null);
     try {
-      if (questionsData && questionsData.subjects) {
-        setSubjects(questionsData.subjects);
+      const response = await fetch('/api/questions');
+      if (!response.ok) {
+        throw new Error('Lỗi khi tải dữ liệu từ máy chủ');
+      }
+      const data = await response.json();
+      
+      if (data && data.subjects) {
+        setSubjects(data.subjects);
       } else {
-        throw new Error("Định dạng dữ liệu câu hỏi không hợp lệ (thiếu subjects)");
+        throw new Error("Định dạng dữ liệu không hợp lệ (thiếu subjects)");
       }
     } catch (err) {
       console.error("Lỗi tải danh sách chủ đề:", err);
-      setError(err.message || "Lỗi xử lý dữ liệu câu hỏi");
+      setError(err.message || "Lỗi kết nối hoặc xử lý dữ liệu");
     } finally {
       setLoading(false);
     }
