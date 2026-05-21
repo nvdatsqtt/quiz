@@ -18,7 +18,7 @@ import QuestionTimer from "@/components/QuestionTimer";
 import Results from "@/components/Results";
 import Login from "@/components/Login";
 import HistorySection from "@/components/HistorySection";
-import { FaPen, FaCheckCircle, FaTimesCircle, FaUser, FaSlidersH, FaPlay, FaHistory } from "react-icons/fa";
+import { FaPen, FaCheckCircle, FaTimesCircle, FaUser, FaSlidersH, FaPlay, FaHistory, FaBookOpen } from "react-icons/fa";
 import questionsData from "../../../../public/data/questions.json";
 
 const Quiz = ({ params }) => {
@@ -31,6 +31,11 @@ const Quiz = ({ params }) => {
   const [selectedQuestionCount, setSelectedQuestionCount] = useState(10);
   const [rawQuestions, setRawQuestions] = useState([]);
   
+  // Các state mới hỗ trợ Thống kê câu hỏi & Chế độ ôn tập
+  const [questionStatsMap, setQuestionStatsMap] = useState({}); // Lưu trữ map thống kê: { question_text: { appears_count, wrong_count } }
+  const [practiceMode, setPracticeMode] = useState("normal"); // Chế độ làm bài: "normal" (thường) hoặc "wrong" (ôn câu hay sai)
+  const [statsLoading, setStatsLoading] = useState(false); // Trạng thái tải thống kê từ database
+
   // State làm bài trắc nghiệm
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -43,7 +48,7 @@ const Quiz = ({ params }) => {
   const [totalTimeSpent, setTotalTimeSpent] = useState(0);
   const [timePerQuestion, setTimePerQuestion] = useState(0);
   const [autoNextCountdown, setAutoNextCountdown] = useState(null);
-  
+
   // Lưu trữ trạng thái từng câu hỏi để hỗ trợ Quay lại (Back)
   const [quizProgress, setQuizProgress] = useState({});
 
@@ -51,14 +56,44 @@ const Quiz = ({ params }) => {
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
 
-  // 1. Tải ngân hàng câu hỏi gốc khi mount
+  // 1. Hàm tải thống kê câu hỏi từ API Turso Database (bảo mật Server-side)
+  const fetchQuestionStats = useCallback(async () => {
+    if (!user || !subject) return;
+    setStatsLoading(true);
+    try {
+      const decodedSubject = decodeURIComponent(subject || "");
+      const res = await fetch(
+        `/api/question-stats?username=${encodeURIComponent(user.username)}&subject=${encodeURIComponent(decodedSubject)}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        // Chuyển danh sách dữ liệu từ DB thành Map Object để tra cứu cực nhanh O(1)
+        const statsMap = {};
+        data.forEach((item) => {
+          statsMap[item.question_text] = {
+            appears_count: item.appears_count,
+            wrong_count: item.wrong_count,
+          };
+        });
+        setQuestionStatsMap(statsMap);
+      } else {
+        console.error("[Turso Database]: Lỗi khi gọi API tải thống kê câu hỏi.");
+      }
+    } catch (err) {
+      console.error("[Turso Database Error]: Lỗi mạng khi tải thống kê câu hỏi:", err);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, [user, subject]);
+
+  // 2. Tải ngân hàng câu hỏi gốc khi mount
   useEffect(() => {
     try {
       const decodedSubject = decodeURIComponent(subject || "").toLowerCase();
       const subjectData = questionsData.subjects.find(
         (s) => s.name.toLowerCase() === decodedSubject
       );
-      
+
       if (subjectData) {
         setRawQuestions(subjectData.questions || []);
         const count = subjectData.questions.length;
@@ -68,6 +103,13 @@ const Quiz = ({ params }) => {
       console.error("Lỗi tải trang cấu hình:", err);
     }
   }, [subject]);
+
+  // 3. Tự động tải lại thống kê câu hỏi mỗi khi người dùng quay lại màn hình Setup (Cấu hình)
+  useEffect(() => {
+    if (user && !isConfigured) {
+      fetchQuestionStats();
+    }
+  }, [user, isConfigured, fetchQuestionStats]);
 
   const cancelAutoNext = useCallback(() => {
     if (autoNextTimerRef.current) {
@@ -83,13 +125,13 @@ const Quiz = ({ params }) => {
 
   const saveResultToHistory = useCallback(async (overrideUnattempted, overrideTimeSpent) => {
     if (!user) return; // Bảo vệ nếu user chưa được tải
-    
+
     const record = {
       id: Date.now().toString(),
       username: user.username,
       subject: decodeURIComponent(subject || ""),
       date: new Date().toISOString(),
-      score: points, 
+      score: points,
       totalQuestions: questions.length,
       correctAnswers: correctAnswers,
       wrongAnswers: wrongAnswers,
@@ -116,6 +158,42 @@ const Quiz = ({ params }) => {
     }
   }, [user, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
 
+  // 4. Hàm đồng bộ thống kê tần suất xuất hiện và số lần làm sai của từng câu hỏi lên Turso Database
+  const saveQuestionStats = useCallback(async () => {
+    if (!user || !subject || questions.length === 0) return;
+
+    // Tổng hợp tiến trình làm bài của từng câu hỏi từ danh sách đề thi hiện tại
+    const stats = questions.map((q, idx) => {
+      const progress = quizProgress[idx];
+      return {
+        question_text: q.question,
+        isCorrect: progress ? progress.isCorrect : null, // true nếu đúng, false nếu sai, null nếu chưa làm/bỏ qua
+        isAnswered: progress ? progress.isAnswered : false, // true nếu đã chọn đáp án, false nếu bỏ qua
+      };
+    });
+
+    try {
+      const decodedSubject = decodeURIComponent(subject || "");
+      const res = await fetch("/api/question-stats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: user.username,
+          subject: decodedSubject,
+          stats: stats,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("[Turso Database]: Gặp lỗi khi lưu thống kê câu hỏi lên Server.");
+      }
+    } catch (err) {
+      console.error("[Turso Database Error]: Lỗi mạng khi cố gắng lưu thống kê câu hỏi:", err);
+    }
+  }, [user, subject, questions, quizProgress]);
+
   // Khai báo handleNext trước để handleAnswer có thể sử dụng (đã bọc useCallback)
   const handleNext = useCallback(async () => {
     // Nếu đang trong quá trình đếm ngược, việc bấm nút sẽ DỪNG đếm ngược
@@ -128,13 +206,13 @@ const Quiz = ({ params }) => {
 
     let nextUnattempted = unattemptedQuestions;
     let nextTimeSpent = totalTimeSpent;
-    
+
     if (!isAnswered && !quizProgress[currentQuestionIndex]?.isSkipped) {
       nextUnattempted += 1;
       nextTimeSpent += timePerQuestion;
       setUnattemptedQuestions(nextUnattempted);
       setTotalTimeSpent(nextTimeSpent);
-      
+
       const newProgress = { ...quizProgress };
       newProgress[currentQuestionIndex] = {
         isAnswered: false,
@@ -147,7 +225,7 @@ const Quiz = ({ params }) => {
     const nextQuestion = currentQuestionIndex + 1;
     if (nextQuestion < questions.length) {
       setCurrentQuestionIndex(nextQuestion);
-      
+
       const savedState = quizProgress[nextQuestion];
       if (savedState) {
         setSelectedOption(savedState.selectedOption);
@@ -156,23 +234,26 @@ const Quiz = ({ params }) => {
         setSelectedOption(null);
         setIsAnswered(false);
       }
-      
+
       setTimePerQuestion(0);
     } else {
-      // Đợi lưu lịch sử hoàn thành để tránh race condition khi component Results render HistorySection
-      await saveResultToHistory(nextUnattempted, nextTimeSpent);
+      // Đợi lưu lịch sử và thống kê hoàn thành đồng thời để tránh race condition khi component Results render HistorySection
+      await Promise.all([
+        saveResultToHistory(nextUnattempted, nextTimeSpent),
+        saveQuestionStats()
+      ]);
       setShowResults(true);
     }
-  }, [autoNextCountdown, cancelAutoNext, unattemptedQuestions, totalTimeSpent, isAnswered, quizProgress, currentQuestionIndex, timePerQuestion, questions.length, saveResultToHistory]);
+  }, [autoNextCountdown, cancelAutoNext, unattemptedQuestions, totalTimeSpent, isAnswered, quizProgress, currentQuestionIndex, timePerQuestion, questions.length, saveResultToHistory, saveQuestionStats]);
 
   const handleAnswer = useCallback((option) => {
     if (isAnswered) return;
     setSelectedOption(option);
     setIsAnswered(true);
     setTotalTimeSpent(totalTimeSpent + timePerQuestion);
-    
+
     const isCorrect = option === questions[currentQuestionIndex].answer;
-    
+
     const isAlreadyAnswered = quizProgress[currentQuestionIndex]?.isAnswered;
     const newProgress = { ...quizProgress };
     newProgress[currentQuestionIndex] = {
@@ -186,11 +267,11 @@ const Quiz = ({ params }) => {
 
     if (!isAlreadyAnswered) {
       if (isCorrect) {
-        setPoints(points + 4); 
+        setPoints(points + 4);
         setCorrectAnswers(correctAnswers + 1);
-        
+
         setAutoNextCountdown(3);
-        
+
         const timer = setTimeout(() => {
           handleNext();
         }, 3000);
@@ -210,7 +291,7 @@ const Quiz = ({ params }) => {
       cancelAutoNext();
       const prevIndex = currentQuestionIndex - 1;
       setCurrentQuestionIndex(prevIndex);
-      
+
       const savedState = quizProgress[prevIndex];
       if (savedState) {
         setSelectedOption(savedState.selectedOption);
@@ -219,7 +300,7 @@ const Quiz = ({ params }) => {
         setSelectedOption(null);
         setIsAnswered(false);
       }
-      
+
       setTimePerQuestion(0);
     }
   }, [currentQuestionIndex, cancelAutoNext, quizProgress]);
@@ -232,8 +313,12 @@ const Quiz = ({ params }) => {
     const finalTime = totalTimeSpent + (isAnswered ? 0 : timePerQuestion);
     setUnattemptedQuestions(finalUnattempted);
     setTotalTimeSpent(finalTime);
-    // Đợi lưu lịch sử hoàn thành để tránh race condition
-    await saveResultToHistory(finalUnattempted, finalTime);
+    
+    // Đợi lưu lịch sử và thống kê hoàn thành đồng thời để tránh race condition
+    await Promise.all([
+      saveResultToHistory(finalUnattempted, finalTime),
+      saveQuestionStats()
+    ]);
     setShowResults(true);
   };
 
@@ -248,18 +333,18 @@ const Quiz = ({ params }) => {
       if (showResults || !isConfigured) return;
 
       const key = e.key.toLowerCase();
-      
+
       const options = questions[currentQuestionIndex]?.options || [];
       if (['1', '2', '3', '4'].includes(key)) {
         const index = parseInt(key) - 1;
         if (options[index]) handleAnswer(options[index]);
       } else if (['a', 'b', 'c', 'd'].includes(key)) {
-        const index = key.charCodeAt(0) - 97; 
+        const index = key.charCodeAt(0) - 97;
         if (options[index]) handleAnswer(options[index]);
       }
-      
+
       if (e.code === 'Space' || e.key === ' ') {
-        e.preventDefault(); 
+        e.preventDefault();
         if (autoNextCountdown !== null) {
           cancelAutoNext();
         } else {
@@ -279,8 +364,8 @@ const Quiz = ({ params }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
-    isConfigured, showResults, currentQuestionIndex, questions, 
-    autoNextCountdown, isAnswered, selectedOption, 
+    isConfigured, showResults, currentQuestionIndex, questions,
+    autoNextCountdown, isAnswered, selectedOption,
     handleAnswer, handleNext, handlePrevious, cancelAutoNext
   ]);
 
@@ -318,14 +403,49 @@ const Quiz = ({ params }) => {
 
   const handleStartQuiz = () => {
     if (rawQuestions.length === 0) return;
-    const selectedQuestions = shuffleQuestions(rawQuestions, selectedQuestionCount);
     
-    // Xáo trộn ngẫu nhiên thứ tự các đáp án cho từng câu hỏi
+    let selectedQuestions = [];
+    if (practiceMode === "wrong") {
+      // 1. Chế độ ôn tập câu hay sai:
+      // Lọc ra các câu hỏi trong ngân hàng mà học viên này từng trả lời sai (wrong_count > 0)
+      const wrongQuestions = rawQuestions.filter(q => (questionStatsMap[q.question]?.wrong_count || 0) > 0);
+      
+      // Sắp xếp theo số lần làm sai giảm dần (câu sai nhiều nhất lên trước)
+      // Nếu bằng nhau, áp dụng xáo trộn ngẫu nhiên
+      const sortedWrong = [...wrongQuestions].sort((a, b) => {
+        const wrongA = questionStatsMap[a.question]?.wrong_count || 0;
+        const wrongB = questionStatsMap[b.question]?.wrong_count || 0;
+        if (wrongB !== wrongA) {
+          return wrongB - wrongA;
+        }
+        return Math.random() - 0.5;
+      });
+      
+      // Cắt lấy số lượng câu hỏi theo cấu hình slider (giới hạn bằng tổng số câu sai có sẵn)
+      const limit = Math.min(selectedQuestionCount, sortedWrong.length);
+      selectedQuestions = sortedWrong.slice(0, limit);
+    } else {
+      // 2. Chế độ thông thường: Ưu tiên các câu hỏi ít xuất hiện hơn để phủ khắp ngân hàng đề
+      // Sắp xếp câu hỏi theo số lần xuất hiện (appears_count) tăng dần
+      // Nếu số lần xuất hiện bằng nhau, xáo trộn ngẫu nhiên
+      const sortedByAppears = [...rawQuestions].sort((a, b) => {
+        const appearsA = questionStatsMap[a.question]?.appears_count || 0;
+        const appearsB = questionStatsMap[b.question]?.appears_count || 0;
+        if (appearsA !== appearsB) {
+          return appearsA - appearsB;
+        }
+        return Math.random() - 0.5;
+      });
+      
+      selectedQuestions = sortedByAppears.slice(0, selectedQuestionCount);
+    }
+
+    // Xáo trộn ngẫu nhiên thứ tự các đáp án cho từng câu hỏi được chọn để tránh học vẹt
     const questionsWithShuffledOptions = selectedQuestions.map(q => ({
       ...q,
       options: shuffleQuestions(q.options, q.options.length)
     }));
-    
+
     setQuestions(questionsWithShuffledOptions);
     setCurrentQuestionIndex(0);
     setSelectedOption(null);
@@ -338,6 +458,23 @@ const Quiz = ({ params }) => {
     setTimePerQuestion(0);
     setPoints(0);
     setIsConfigured(true);
+  };
+
+  // --- TÍNH TOÁN CÁC BIẾN PHỤ TRỢ THỐNG KÊ (ĐẶT SAU TẤT CẢ CÁC HOOKS) ---
+  const wrongQuestionsList = rawQuestions.filter(q => (questionStatsMap[q.question]?.wrong_count || 0) > 0);
+  const answeredQuestionsCount = rawQuestions.filter(q => (questionStatsMap[q.question]?.appears_count || 0) > 0).length;
+
+  // Hàm chuyển đổi chế độ làm bài và điều chỉnh slider tương ứng tránh vượt quá giới hạn
+  const handleModeChange = (mode) => {
+    setPracticeMode(mode);
+    if (mode === "wrong") {
+      const wrongCount = wrongQuestionsList.length;
+      // Nếu số câu sai lớn hơn 10, để mặc định 10 câu. Nếu nhỏ hơn 5, lấy toàn bộ câu sai.
+      setSelectedQuestionCount(wrongCount > 10 ? 10 : (wrongCount >= 5 ? 5 : wrongCount));
+    } else {
+      const totalCount = rawQuestions.length;
+      setSelectedQuestionCount(totalCount > 20 ? 20 : totalCount);
+    }
   };
 
   // --- CÁC RETURN CÓ ĐIỀU KIỆN PHẢI ĐẶT SAU TẤT CẢ CÁC HOOKS ---
@@ -366,6 +503,9 @@ const Quiz = ({ params }) => {
   }
 
   if (!isConfigured) {
+    const maxSelectCount = practiceMode === "wrong" ? wrongQuestionsList.length : rawQuestions.length;
+    const progressPercentage = Math.round((answeredQuestionsCount / rawQuestions.length) * 100);
+
     return (
       <div className="p-4 sm:p-6 bg-slate-50 min-h-screen flex flex-col items-center justify-start py-8">
         <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-6 sm:p-10 transition-all duration-300">
@@ -376,19 +516,144 @@ const Quiz = ({ params }) => {
             Chủ đề: <span className="text-blue-900 font-bold">{decodeURIComponent(subject || "")}</span>
           </p>
 
+          {/* 📊 PREMIUM DASHBOARD THỐNG KÊ TIẾN TRÌNH */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {/* Widget 1: Tiến trình ôn luyện */}
+            <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100/80 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+                  <FaHistory className="text-lg" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Tiến trình ôn luyện</p>
+                  <h4 className="text-lg font-black text-slate-800">Đã gặp trong đề thi</h4>
+                </div>
+              </div>
+              <div className="mt-2">
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-2xl font-black text-indigo-700">{answeredQuestionsCount} <span className="text-sm font-semibold text-slate-400">/ {rawQuestions.length} Câu</span></span>
+                  <span className="text-sm font-extrabold text-indigo-600">{progressPercentage}%</span>
+                </div>
+                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-indigo-600 rounded-full transition-all duration-500" style={{ width: `${progressPercentage}%` }}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Widget 2: Câu hỏi bị sai */}
+            <div className="p-5 rounded-2xl bg-rose-50/50 border border-rose-100 shadow-sm flex flex-col justify-between">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white">
+                  <FaTimesCircle className="text-lg" />
+                </div>
+                <div>
+                  <p className="text-xs text-rose-400 font-bold uppercase tracking-wider">Khắc phục điểm yếu</p>
+                  <h4 className="text-lg font-black text-slate-800">Câu hỏi từng làm sai</h4>
+                </div>
+              </div>
+              <div className="mt-2">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-3xl font-black text-rose-600">{wrongQuestionsList.length} <span className="text-sm font-semibold text-slate-400">Câu</span></span>
+                  <span className={`text-[10px] px-2.5 py-1 rounded-full font-black border uppercase tracking-wider ${
+                    wrongQuestionsList.length > 0 ? "bg-rose-100 text-rose-700 border-rose-200 animate-pulse" : "bg-green-100 text-green-700 border-green-200"
+                  }`}>
+                    {wrongQuestionsList.length > 0 ? "Cần ôn tập" : "Tuyệt vời!"}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-2 font-medium">Hệ thống ghi nhận để bạn ôn luyện lại các lỗi sai.</p>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col mb-8">
             <div className="space-y-6 border-slate-100">
+              
+              {/* 👥 THÔNG TIN HỌC VIÊN */}
               <div>
                 <label className="flex items-center gap-2 text-slate-700 font-bold mb-3">
                   <FaUser className="text-blue-600 text-lg" />
                   Học viên đang đăng nhập:
                 </label>
-                <div className="px-5 py-4 rounded-xl border-2 border-blue-500 bg-blue-50/50 text-blue-700 font-black flex items-center justify-between">
+                <div className="px-5 py-4 rounded-xl border-2 border-blue-500 bg-blue-50/50 text-blue-700 font-black flex items-center justify-between shadow-sm">
                   <span>{user.username}</span>
-                  {user.isAdmin && <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded uppercase">Quản trị viên</span>}
+                  {user.isAdmin && <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded uppercase font-bold tracking-wider">Quản trị viên</span>}
                 </div>
               </div>
 
+              {/* ⚡ CHỌN CHẾ ĐỘ ÔN TẬP */}
+              <div>
+                <label className="flex items-center gap-2 text-slate-700 font-bold mb-3">
+                  <FaBookOpen className="text-blue-600 text-lg" />
+                  Chọn chế độ làm bài:
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Chế độ 1: Ôn luyện thông minh */}
+                  <button
+                    type="button"
+                    onClick={() => handleModeChange("normal")}
+                    className={`p-5 rounded-2xl border-2 text-left transition-all duration-300 flex gap-4 hover:shadow-md ${
+                      practiceMode === "normal"
+                        ? "border-blue-600 bg-blue-50/40 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-blue-300"
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center font-bold ${
+                      practiceMode === "normal" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 text-slate-500"
+                    }`}>
+                      1
+                    </div>
+                    <div>
+                      <h5 className="font-black text-slate-800 text-sm md:text-base">Ôn tập thông minh</h5>
+                      <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
+                        Ưu tiên hiển thị các câu hỏi ít xuất hiện hơn để bạn ghi nhớ đều đặn toàn bộ ngân hàng câu hỏi.
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Chế độ 2: Ôn tập câu hỏi hay sai */}
+                  <button
+                    type="button"
+                    disabled={wrongQuestionsList.length === 0}
+                    onClick={() => handleModeChange("wrong")}
+                    className={`p-5 rounded-2xl border-2 text-left transition-all duration-300 flex gap-4 ${
+                      wrongQuestionsList.length === 0
+                        ? "border-slate-100 bg-slate-50 text-slate-400 cursor-not-allowed opacity-60"
+                        : practiceMode === "wrong"
+                        ? "border-rose-500 bg-rose-50/40 shadow-sm hover:shadow-md"
+                        : "border-slate-200 bg-white hover:border-rose-300 hover:shadow-md"
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center font-bold ${
+                      wrongQuestionsList.length === 0
+                        ? "bg-slate-200 text-slate-300"
+                        : practiceMode === "wrong"
+                        ? "bg-rose-500 text-white animate-pulse"
+                        : "bg-slate-100 text-slate-500"
+                    }`}>
+                      2
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h5 className={`font-black text-sm md:text-base ${wrongQuestionsList.length === 0 ? "text-slate-400" : "text-slate-800"}`}>
+                          Khắc phục điểm yếu
+                        </h5>
+                        {wrongQuestionsList.length > 0 && (
+                          <span className="text-[9px] bg-rose-600 text-white font-extrabold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">
+                            {wrongQuestionsList.length}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 font-medium leading-relaxed">
+                        {wrongQuestionsList.length === 0
+                          ? "Bạn chưa có câu hỏi nào trả lời sai. Hãy luyện tập chế độ thường trước!"
+                          : "Chỉ làm lại các câu bạn đã trả lời sai, ưu tiên câu sai nhiều lần nhất để nhớ lâu."}
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* 🎚️ SLIDER CHỌN SỐ LƯỢNG CÂU HỎI */}
               <div>
                 <label className="flex items-center justify-between text-slate-700 font-bold mb-3">
                   <span className="flex items-center gap-2">
@@ -396,35 +661,40 @@ const Quiz = ({ params }) => {
                     Số lượng câu hỏi:
                   </span>
                   <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-extrabold shadow-sm">
-                    {selectedQuestionCount} / {rawQuestions.length} Câu
+                    {selectedQuestionCount} / {maxSelectCount} Câu
                   </span>
                 </label>
                 <div className="flex items-center gap-4 mt-2">
-                  <span className="text-xs font-bold text-slate-400">5</span>
+                  <span className="text-xs font-bold text-slate-400">
+                    {maxSelectCount === 0 ? 0 : Math.min(5, maxSelectCount)}
+                  </span>
                   <input
                     type="range"
-                    min="5"
-                    max={rawQuestions.length}
+                    min={maxSelectCount === 0 ? 0 : Math.min(5, maxSelectCount)}
+                    max={maxSelectCount}
                     value={selectedQuestionCount}
+                    disabled={maxSelectCount === 0}
                     onChange={(e) => setSelectedQuestionCount(parseInt(e.target.value))}
-                    className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 disabled:opacity-50"
                   />
-                  <span className="text-xs font-bold text-slate-400">{rawQuestions.length}</span>
+                  <span className="text-xs font-bold text-slate-400">{maxSelectCount}</span>
                 </div>
               </div>
 
+              {/* 🚀 NÚT BẮT ĐẦU */}
               <button
                 onClick={handleStartQuiz}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95"
+                disabled={maxSelectCount === 0}
+                className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed text-white rounded-2xl font-black text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95"
               >
-                <FaPlay /> BẮT ĐẦU ÔN LUYỆN
+                <FaPlay /> {practiceMode === "wrong" ? "BẮT ĐẦU ÔN LUYỆN ĐIỂM YẾU" : "BẮT ĐẦU ÔN LUYỆN THÔNG MINH"}
               </button>
             </div>
           </div>
 
           <div className="border-t pt-4 text-center">
-            <span className="text-red-600 font-black text-xs bg-red-50 border border-red-200 rounded px-3 py-1.5 uppercase select-none tracking-wider">
-              Hệ thống ôn luyện nội bộ - Nghiêm cấm sao chép
+            <span className="text-red-600 font-black text-xs bg-red-50 border border-red-200 rounded px-3 py-1.5 uppercase select-none tracking-wider shadow-inner">
+              Chỉ sử dụng nội bộ
             </span>
           </div>
         </div>
@@ -437,14 +707,14 @@ const Quiz = ({ params }) => {
       {!showResults ? (
         <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl p-5 sm:p-8 relative transition-all duration-300 border border-slate-100">
           <div className="absolute top-0 left-0 right-0 h-6 bg-slate-100 rounded-t-3xl overflow-hidden border-b border-slate-200 flex">
-            <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 flex items-center justify-center text-white text-[11px] font-black tracking-widest min-w-[55px] shadow-inner" 
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 flex items-center justify-center text-white text-[11px] font-black tracking-widest min-w-[55px] shadow-inner"
               style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
             >
               {currentQuestionIndex + 1}/{questions.length}
             </div>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 border-b pb-4 mt-6">
             <div className="flex gap-4">
               <div className="group relative flex items-center justify-center w-10 h-10 bg-blue-50 rounded-full border border-blue-100 shadow-sm text-blue-700 hover:bg-blue-100 transition duration-300 select-none">
@@ -486,21 +756,19 @@ const Quiz = ({ params }) => {
                 key={option}
                 onClick={() => handleAnswer(option)}
                 disabled={isAnswered}
-                className={`w-full py-4 px-6 rounded-2xl text-base sm:text-lg font-bold text-left transition-all duration-300 focus:outline-none flex items-center gap-3 border shadow-sm ${
-                  isAnswered && option === questions[currentQuestionIndex].answer
+                className={`w-full py-4 px-6 rounded-2xl text-base sm:text-lg font-bold text-left transition-all duration-300 focus:outline-none flex items-center gap-3 border shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
                     ? "bg-green-600 text-white border-green-600 shadow-green-100"
                     : isAnswered && option === selectedOption
-                    ? "bg-red-600 text-white border-red-600 shadow-red-100"
-                    : "bg-slate-50 hover:bg-blue-50 hover:border-blue-300 focus:bg-blue-50 text-slate-800 border-slate-200 hover:shadow"
-                }`}
+                      ? "bg-red-600 text-white border-red-600 shadow-red-100"
+                      : "bg-slate-50 hover:bg-blue-50 hover:border-blue-300 focus:bg-blue-50 text-slate-800 border-slate-200 hover:shadow"
+                  }`}
               >
-                <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${
-                  isAnswered && option === questions[currentQuestionIndex].answer
+                <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
                     ? "bg-white text-green-600 border-white font-extrabold"
                     : isAnswered && option === selectedOption
-                    ? "bg-white text-red-600 border-white font-extrabold"
-                    : "bg-white text-blue-600 border-blue-100"
-                }`}>
+                      ? "bg-white text-red-600 border-white font-extrabold"
+                      : "bg-white text-blue-600 border-blue-100"
+                  }`}>
                   {optionPrefixes[index]}
                 </span>
                 <span className="flex-1 leading-snug">{option}</span>
@@ -510,14 +778,13 @@ const Quiz = ({ params }) => {
 
           <div className="mt-8 flex flex-col gap-4 select-none">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button 
-                onClick={handlePrevious} 
+              <button
+                onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className={`py-4 px-6 rounded-2xl font-black text-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${
-                  currentQuestionIndex === 0 
-                  ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
-                  : "bg-slate-700 hover:bg-slate-800 text-white cursor-pointer"
-                }`}
+                className={`py-4 px-6 rounded-2xl font-black text-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${currentQuestionIndex === 0
+                    ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-slate-700 hover:bg-slate-800 text-white cursor-pointer"
+                  }`}
               >
                 Quay lại câu trước
               </button>
@@ -527,15 +794,15 @@ const Quiz = ({ params }) => {
             </div>
             <div className="flex flex-col gap-2">
               <button onClick={handleNext} className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-2xl font-black text-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer">
-                {isAnswered 
-                  ? (currentQuestionIndex === questions.length - 1 
-                      ? "Nộp bài và xem kết quả" 
-                      : (autoNextCountdown !== null ? `Đang chuyển câu tiếp theo (${autoNextCountdown}s)` : "Câu hỏi tiếp theo")
-                    )
+                {isAnswered
+                  ? (currentQuestionIndex === questions.length - 1
+                    ? "Nộp bài và xem kết quả"
+                    : (autoNextCountdown !== null ? `Đang chuyển câu tiếp theo (${autoNextCountdown}s)` : "Câu hỏi tiếp theo")
+                  )
                   : (currentQuestionIndex === questions.length - 1 ? "Bỏ qua & Xem kết quả" : "Bỏ qua & Câu tiếp theo")
                 }
               </button>
-              
+
               {/* Hướng dẫn khi trả lời đúng (đang đếm ngược) */}
               {autoNextCountdown !== null && (
                 <p className="text-center text-[11px] text-blue-500 font-bold animate-pulse">

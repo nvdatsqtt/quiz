@@ -35,6 +35,20 @@ export async function initDb() {
       );
     `);
     console.log("[Turso Database]: Đã kiểm tra và khởi tạo bảng quiz_history thành công!");
+
+    // Thực hiện truy vấn tạo bảng thống kê câu hỏi nếu chưa có
+    // Dùng question_text làm khóa chính kết hợp vì câu hỏi trong câu hỏi JSON không có id cụ thể
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS question_stats (
+        username TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        question_text TEXT NOT NULL,
+        appears_count INTEGER NOT NULL DEFAULT 0,
+        wrong_count INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (username, subject, question_text)
+      );
+    `);
+    console.log("[Turso Database]: Đã kiểm tra và khởi tạo bảng question_stats thành công!");
   } catch (err) {
     console.error("[Turso Database Error]: Lỗi khi tự động khởi tạo bảng:", err);
   }
