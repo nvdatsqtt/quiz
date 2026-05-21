@@ -7,6 +7,7 @@
 
 import { FaCoins, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image";
 import { usePoints } from "@/context/PointsContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -19,9 +20,17 @@ const Header = () => {
       {/* Logo / Link quay về Trang chủ */}
       <Link
         href="/"
-        className="text-2xl sm:text-3xl font-black text-white hover:text-blue-400 transition-all duration-300 uppercase tracking-tighter"
+        className="flex items-center gap-3 text-2xl sm:text-3xl font-black text-white hover:text-blue-400 transition-all duration-300 uppercase tracking-tighter"
       >
-        Website trắc nghiệm
+        <div className="relative w-8 h-6 sm:w-10 sm:h-7 shadow-sm border border-white/10 overflow-hidden rounded-sm">
+          <Image
+            src="/images/vietnam-flag.svg"
+            alt="Vietnam Flag"
+            fill
+            className="object-cover"
+          />
+        </div>
+        <span>Website trắc nghiệm</span>
       </Link>
 
       <div className="flex items-center gap-4 sm:gap-8">

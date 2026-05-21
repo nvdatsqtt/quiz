@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { FaUser, FaLock, FaSignInAlt } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -23,8 +24,13 @@ export default function Login() {
     <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4">
-            <FaUser className="text-blue-600 text-3xl" />
+          <div className="inline-flex items-center justify-center w-24 h-16 bg-white border border-gray-100 rounded-lg shadow-sm mb-4 overflow-hidden relative">
+            <Image
+              src="/images/vietnam-flag.svg"
+              alt="Vietnam Flag"
+              fill
+              className="object-cover"
+            />
           </div>
           <h1 className="text-3xl font-black text-slate-800 uppercase tracking-wide">Đăng nhập</h1>
           <p className="text-slate-500 font-medium">Vui lòng đăng nhập để bắt đầu ôn luyện</p>

@@ -19,8 +19,12 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Quiz App",
-  description: "Quiz App For Students",
+  title: "Website trắc nghiệm",
+  description: "Hệ thống ôn luyện trắc nghiệm nội bộ",
+  icons: {
+    icon: "/images/vietnam-flag.svg",
+    apple: "/images/vietnam-flag.svg",
+  },
 };
 
 export default function RootLayout({ children }) {

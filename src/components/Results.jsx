@@ -33,6 +33,7 @@ import { useWindowSize } from 'react-use';
 
 import HistorySection from "@/components/HistorySection";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 
 const Results = ({
   score,
@@ -79,8 +80,13 @@ const Results = ({
 
       {/* Panel thông tin người thi & môn thi */}
       <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-3xl p-6 sm:p-8 shadow-xl text-center mb-8 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 opacity-10 text-9xl">
-          <FaAward />
+        <div className="absolute -right-10 -bottom-10 opacity-20 w-48 h-32 rotate-12">
+          <Image
+            src="/images/vietnam-flag.svg"
+            alt="Vietnam Flag"
+            fill
+            className="object-cover"
+          />
         </div>
         <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wider mb-2">
           Kết quả ôn luyện trắc nghiệm

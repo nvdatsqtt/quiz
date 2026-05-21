@@ -1,1 +1,1 @@
-Load all the rules in .agents/rules folder, then follow it strictly.
+Load all the rules in .agents/rules folder, then follow it strictly (Load these once time and use during session)

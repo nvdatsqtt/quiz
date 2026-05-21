@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@libsql/client": "^0.17.3",
     "@vercel/speed-insights": "^1.0.12",
     "next": "14.2.13",
     "react": "^18",

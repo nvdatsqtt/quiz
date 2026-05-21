@@ -11,6 +11,7 @@ import SubjectCard from '@/components/SubjectCard';
 import Login from '@/components/Login';
 import HistorySection from '@/components/HistorySection';
 import { useAuth } from '@/context/AuthContext';
+import Image from "next/image";
 // Import trực tiếp câu hỏi tĩnh từ file JSON để tải ngay lập tức, tránh lỗi mạng ở chế độ dev
 import questionsData from "../../public/data/questions.json";
 
@@ -69,7 +70,14 @@ export default function Home() {
       <div className="w-full max-w-screen-xl space-y-12">
         <section>
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-2 bg-blue-600 rounded-full"></div>
+            <div className="relative w-8 h-6 shadow-sm border border-gray-200 overflow-hidden rounded-sm shrink-0">
+              <Image
+                src="/images/vietnam-flag.svg"
+                alt="Vietnam Flag"
+                fill
+                className="object-cover"
+              />
+            </div>
             <h2 className="text-2xl font-black text-slate-800 uppercase">Danh sách chủ đề ôn luyện</h2>
           </div>
 
@@ -101,7 +109,14 @@ export default function Home() {
         {/* Lịch sử ôn tập */}
         <section>
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-2 bg-indigo-600 rounded-full"></div>
+            <div className="relative w-8 h-6 shadow-sm border border-gray-200 overflow-hidden rounded-sm shrink-0">
+              <Image
+                src="/images/vietnam-flag.svg"
+                alt="Vietnam Flag"
+                fill
+                className="object-cover"
+              />
+            </div>
             <h2 className="text-2xl font-black text-slate-800 uppercase">Lịch sử ôn tập gần đây</h2>
           </div>
           <HistorySection currentUser={user} />

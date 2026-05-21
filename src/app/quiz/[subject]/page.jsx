@@ -11,7 +11,7 @@
  * - Thanh tiến trình số hóa hiện số x/N ở trung tâm phần màu xanh đã làm.
  */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { usePoints } from "@/context/PointsContext";
 import { useAuth } from "@/context/AuthContext";
 import QuestionTimer from "@/components/QuestionTimer";
@@ -107,7 +107,37 @@ const Quiz = ({ params }) => {
     setIsConfigured(true);
   };
 
-  const handleAnswer = (option) => {
+  const cancelAutoNext = useCallback(() => {
+    if (autoNextTimerRef.current) {
+      clearTimeout(autoNextTimerRef.current);
+      autoNextTimerRef.current = null;
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    setAutoNextCountdown(null);
+  }, []);
+
+  const saveResultToHistory = useCallback((overrideUnattempted, overrideTimeSpent) => {
+    const record = {
+      id: Date.now().toString(),
+      username: user.username,
+      subject: decodeURIComponent(subject || ""),
+      date: new Date().toISOString(),
+      score: points, // points is already updated in handleAnswer
+      totalQuestions: questions.length,
+      correctAnswers: correctAnswers,
+      wrongAnswers: wrongAnswers,
+      unattemptedQuestions: overrideUnattempted !== undefined ? overrideUnattempted : unattemptedQuestions,
+      timeSpent: overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent,
+      averageTime: ((overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent) / questions.length).toFixed(1)
+    };
+    const localHistory = JSON.parse(localStorage.getItem("quiz_history") || "[]");
+    localStorage.setItem("quiz_history", JSON.stringify([record, ...localHistory]));
+  }, [user.username, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
+
+  const handleAnswer = useCallback((option) => {
     if (isAnswered) return;
     setSelectedOption(option);
     setIsAnswered(true);
@@ -149,21 +179,9 @@ const Quiz = ({ params }) => {
         setWrongAnswers(wrongAnswers + 1);
       }
     }
-  };
+  }, [isAnswered, totalTimeSpent, timePerQuestion, questions, currentQuestionIndex, quizProgress, points, setPoints, correctAnswers, setCorrectAnswers, wrongAnswers, setWrongAnswers]);
 
-  const cancelAutoNext = () => {
-    if (autoNextTimerRef.current) {
-      clearTimeout(autoNextTimerRef.current);
-      autoNextTimerRef.current = null;
-    }
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
-    }
-    setAutoNextCountdown(null);
-  };
-
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     // Nếu đang trong quá trình đếm ngược, việc bấm nút sẽ DỪNG đếm ngược (theo yêu cầu mới)
     if (autoNextCountdown !== null) {
       cancelAutoNext();
@@ -212,9 +230,9 @@ const Quiz = ({ params }) => {
       saveResultToHistory(nextUnattempted, nextTimeSpent);
       setShowResults(true);
     }
-  };
+  }, [autoNextCountdown, cancelAutoNext, unattemptedQuestions, totalTimeSpent, isAnswered, quizProgress, currentQuestionIndex, timePerQuestion, questions.length, saveResultToHistory]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
       cancelAutoNext();
       const prevIndex = currentQuestionIndex - 1;
@@ -232,54 +250,7 @@ const Quiz = ({ params }) => {
       
       setTimePerQuestion(0);
     }
-  };
-
-  const handleTimeUp = () => {
-    setIsAnswered(true);
-    cancelAutoNext();
-
-    const nextUnattempted = unattemptedQuestions + 1;
-    const nextTimeSpent = totalTimeSpent + 60;
-    setUnattemptedQuestions(nextUnattempted);
-    setTotalTimeSpent(nextTimeSpent);
-    const nextQuestion = currentQuestionIndex + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestionIndex(nextQuestion);
-      
-      // Khôi phục trạng thái nếu đã làm câu này rồi (hỗ trợ Back/Next)
-      const savedState = quizProgress[nextQuestion];
-      if (savedState) {
-        setSelectedOption(savedState.selectedOption);
-        setIsAnswered(savedState.isAnswered);
-      } else {
-        setSelectedOption(null);
-        setIsAnswered(false);
-      }
-      
-      setTimePerQuestion(0);
-    } else {
-      saveResultToHistory(nextUnattempted, nextTimeSpent);
-      setShowResults(true);
-    }
-  };
-
-  const saveResultToHistory = (overrideUnattempted, overrideTimeSpent) => {
-    const record = {
-      id: Date.now().toString(),
-      username: user.username,
-      subject: decodeURIComponent(subject || ""),
-      date: new Date().toISOString(),
-      score: points, // points is already updated in handleAnswer
-      totalQuestions: questions.length,
-      correctAnswers: correctAnswers,
-      wrongAnswers: wrongAnswers,
-      unattemptedQuestions: overrideUnattempted !== undefined ? overrideUnattempted : unattemptedQuestions,
-      timeSpent: overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent,
-      averageTime: ((overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent) / questions.length).toFixed(1)
-    };
-    const localHistory = JSON.parse(localStorage.getItem("quiz_history") || "[]");
-    localStorage.setItem("quiz_history", JSON.stringify([record, ...localHistory]));
-  };
+  }, [currentQuestionIndex, cancelAutoNext, quizProgress]);
 
   const handleForceFinish = () => {
     cancelAutoNext();
@@ -297,6 +268,53 @@ const Quiz = ({ params }) => {
     setIsConfigured(false);
     setShowResults(false);
   };
+
+  // 2. Xử lý phím tắt bàn phím
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Nếu đã kết thúc hoặc chưa cấu hình thì không nhận phím
+      if (showResults || !isConfigured) return;
+
+      const key = e.key.toLowerCase();
+      
+      // 1, 2, 3, 4 hoặc a, b, c, d để chọn đáp án
+      const options = questions[currentQuestionIndex]?.options || [];
+      if (['1', '2', '3', '4'].includes(key)) {
+        const index = parseInt(key) - 1;
+        if (options[index]) handleAnswer(options[index]);
+      } else if (['a', 'b', 'c', 'd'].includes(key)) {
+        const index = key.charCodeAt(0) - 97; // a=0, b=1...
+        if (options[index]) handleAnswer(options[index]);
+      }
+      
+      // Space để Tiếp tục/Bỏ qua/Dừng đếm ngược
+      if (e.code === 'Space' || e.key === ' ') {
+        e.preventDefault(); // Tránh cuộn trang
+        if (autoNextCountdown !== null) {
+          cancelAutoNext();
+        } else {
+          handleNext();
+        }
+      }
+
+      // P để quay lại
+      if (key === 'p') {
+        handlePrevious();
+      }
+
+      // N để tới câu tiếp theo
+      if (key === 'n') {
+        handleNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    isConfigured, showResults, currentQuestionIndex, questions, 
+    autoNextCountdown, isAnswered, selectedOption, 
+    handleAnswer, handleNext, handlePrevious, cancelAutoNext // Đầy đủ dependency
+  ]);
 
   const handleContainerClick = (e) => {
     // 1. Nếu đang đếm ngược tự động chuyển câu -> Click để DỪNG
@@ -345,8 +363,8 @@ const Quiz = ({ params }) => {
             Chủ đề: <span className="text-blue-900 font-bold">{decodeURIComponent(subject || "")}</span>
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div className="space-y-6 border-r pr-0 md:pr-8 border-slate-100">
+          <div className="flex flex-col mb-8">
+            <div className="space-y-6 border-slate-100">
               <div>
                 <label className="flex items-center gap-2 text-slate-700 font-bold mb-3">
                   <FaUser className="text-blue-600 text-lg" />
@@ -388,16 +406,6 @@ const Quiz = ({ params }) => {
               >
                 <FaPlay /> BẮT ĐẦU ÔN LUYỆN
               </button>
-            </div>
-
-            <div className="flex flex-col">
-              <h3 className="flex items-center gap-2 text-slate-700 font-black text-xl mb-4">
-                <FaHistory className="text-indigo-600" />
-                Lịch sử ôn tập chủ đề này
-              </h3>
-              <div className="flex-1 overflow-y-auto max-h-[400px]">
-                <HistorySection currentUser={user} subjectFilter={decodeURIComponent(subject || "")} />
-              </div>
             </div>
           </div>
 
@@ -446,7 +454,6 @@ const Quiz = ({ params }) => {
               </div>
             </div>
             <QuestionTimer
-              onTimeUp={handleTimeUp}
               setTimePerQuestion={setTimePerQuestion}
               isAnswered={isAnswered}
               resetTimer={currentQuestionIndex}
@@ -529,6 +536,27 @@ const Quiz = ({ params }) => {
                   * Trả lời sai. Click vùng trống hoặc nút để tiếp tục
                 </p>
               )}
+            </div>
+
+            {/* Hướng dẫn phím tắt bàn phím (PC) */}
+            <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap justify-center gap-x-6 gap-y-3 text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-widest select-none">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-slate-600 shadow-sm">A,B,C,D</span>
+                <span className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-slate-600 shadow-sm">1,2,3,4</span>
+                <span>Chọn đáp án</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-slate-600 shadow-sm">Space</span>
+                <span>Tiếp tục / Dừng tự động</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-slate-600 shadow-sm">P</span>
+                <span>Câu trước</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-slate-600 shadow-sm">N</span>
+                <span>Câu sau</span>
+              </div>
             </div>
           </div>
         </div>
