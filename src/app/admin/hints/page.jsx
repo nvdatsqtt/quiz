@@ -56,6 +56,17 @@ export default function AdminHintsReview() {
     }
   };
 
+  const getHintDisplay = (hintStr) => {
+    if (!hintStr) return '(Trống)';
+    try {
+      const parsed = JSON.parse(hintStr);
+      if (parsed && typeof parsed === 'object' && parsed.text !== undefined) {
+        return parsed.text;
+      }
+    } catch(e) {}
+    return hintStr;
+  };
+
   if (authLoading || loading) return <div className="p-8 text-center font-bold text-gray-500">Đang tải dữ liệu...</div>;
   if (!user?.isAdmin) return null;
 
@@ -88,14 +99,14 @@ export default function AdminHintsReview() {
                 {hint.hint_status === 'pending' ? (
                   <>
                     <p className="text-sm text-slate-500 mb-1 font-bold">Gợi ý hiện tại (Đang hiển thị):</p>
-                    <p className="text-slate-700 mb-4 bg-white p-3 rounded border">{hint.hint_text || '(Trống)'}</p>
+                    <p className="text-slate-700 mb-4 bg-white p-3 rounded border">{getHintDisplay(hint.hint_text)}</p>
                     <p className="text-sm text-blue-600 font-black mb-1">Gợi ý mới đề xuất:</p>
-                    <p className="text-blue-900 font-medium bg-blue-50/50 p-3 rounded border border-blue-100">{hint.hint_pending_text}</p>
+                    <p className="text-blue-900 font-medium bg-blue-50/50 p-3 rounded border border-blue-100">{getHintDisplay(hint.hint_pending_text)}</p>
                   </>
                 ) : (
                   <>
                     <p className="text-sm text-blue-600 font-black mb-1">Gợi ý mới (Đã tự động hiển thị cho người dùng):</p>
-                    <p className="text-blue-900 font-medium bg-blue-50/50 p-3 rounded border border-blue-100">{hint.hint_text}</p>
+                    <p className="text-blue-900 font-medium bg-blue-50/50 p-3 rounded border border-blue-100">{getHintDisplay(hint.hint_text)}</p>
                   </>
                 )}
               </div>

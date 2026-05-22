@@ -11,7 +11,7 @@
  * - Thanh tiến trình số hóa hiện số x/N ở trung tâm phần màu xanh đã làm.
  */
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, memo } from "react";
 import { usePoints } from "@/context/PointsContext";
 import { useAuth } from "@/context/AuthContext";
 import QuestionTimer from "@/components/QuestionTimer";
@@ -19,6 +19,21 @@ import Results from "@/components/Results";
 import Login from "@/components/Login";
 import HistorySection from "@/components/HistorySection";
 import { FaPen, FaCheckCircle, FaTimesCircle, FaUser, FaSlidersH, FaPlay, FaHistory, FaBookOpen } from "react-icons/fa";
+
+// Component chỉnh sửa nội dung tối ưu hóa hiệu năng, triệt tiêu hoàn toàn re-render khi bôi đen
+// Tác giả: Nguyễn Văn Đạt | Giúp bảo toàn selection và cursor của trình duyệt
+const EditableContent = memo(({ id, className, initialHtml }) => {
+  return (
+    <div
+      id={id}
+      contentEditable="true"
+      suppressContentEditableWarning={true}
+      className={className}
+      dangerouslySetInnerHTML={{ __html: initialHtml }}
+    />
+  );
+});
+EditableContent.displayName = "EditableContent";
 
 const Quiz = ({ params }) => {
   const { subject } = params;
@@ -48,41 +63,18 @@ const Quiz = ({ params }) => {
   const [hintInput, setHintInput] = useState("");
   const [isSubmittingHint, setIsSubmittingHint] = useState(false);
 
-  useEffect(() => {
-    setShowHint(false);
-    setShowHintForm(false);
-    setHintInput("");
-  }, [currentQuestionIndex]);
+  // --- HỆ THỐNG STATE HINT & HIGHLIGHT V3 (TOÀN DIỆN MỚI) ---
+  const [isEditingHint, setIsEditingHint] = useState(false); // Trạng thái đang chỉnh sửa gợi ý/highlight v3
+  const [hintInputs, setHintInputs] = useState(["", "", "", ""]); // Quản lý 4 ô nhập giải thích tương ứng với 4 đáp án
+  const [selectedOptionForEdit, setSelectedOptionForEdit] = useState(null); // Giữ lại tương thích hoặc phục vụ các logic phụ nếu cần
+  const [toolbarState, setToolbarState] = useState({
+    show: false,
+    top: 0,
+    left: 0,
+    targetType: "", // "question" hoặc "option"
+    optionIndex: -1
+  });
 
-  const handleSubmitHint = async () => {
-    if (!hintInput.trim()) return;
-    setIsSubmittingHint(true);
-    try {
-      const q = questions[currentQuestionIndex];
-      const res = await fetch(`/api/questions/${q.id}/hint`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: user.isAdmin ? "Admin" : "User", new_hint: hintInput, username: user.username })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        setShowHintForm(false);
-        setHintInput("");
-        if (user.isAdmin || !q.hint_text) {
-           setQuestions(prev => prev.map((item, idx) => idx === currentQuestionIndex ? {...item, hint_text: hintInput} : item));
-           setRawQuestions(prev => prev.map((item) => item.id === q.id ? {...item, hint_text: hintInput} : item));
-        }
-      } else {
-        alert(data.error);
-      }
-    } catch(e) {
-      console.error(e);
-      alert("Lỗi kết nối khi gửi gợi ý");
-    } finally {
-      setIsSubmittingHint(false);
-    }
-  };
   const [showResults, setShowResults] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [wrongAnswers, setWrongAnswers] = useState(0);
@@ -97,6 +89,225 @@ const Quiz = ({ params }) => {
   // Ref quản lý timer tự nhảy câu hỏi
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
+
+  // Helper kiểm tra chuỗi HTML trống hoặc chỉ chứa thẻ rác (như <br>, &nbsp;, các thẻ block rỗng)
+  // Tác giả: Nguyễn Văn Đạt | Giúp ngăn ngừa việc hiển thị một dòng trống khi người dùng xóa hết chữ trong contentEditable
+  const isEmptyHTML = useCallback((html) => {
+    if (!html) return true;
+    const cleanText = html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, "").trim();
+    return cleanText === "";
+  }, []);
+
+  // Helper an toàn phân tách text gợi ý và highlight theo kiến trúc V3 (Tương thích ngược hoàn hảo)
+  // Tác giả: Nguyễn Văn Đạt | Đảm bảo an toàn dữ liệu, tự động fallback về văn bản gốc nếu highlight trống
+  const parseHint = useCallback((hintString, q) => {
+    // Cấu trúc mặc định nếu không có dữ liệu gợi ý (DB bảng questions sử dụng trường question)
+    const defaultStructure = {
+      question_highlight: q?.question || "",
+      options: q?.options?.map(opt => ({ text: opt, hint: "" })) || []
+    };
+
+    if (!hintString) return defaultStructure;
+
+    try {
+      const parsed = JSON.parse(hintString);
+      if (parsed && typeof parsed === "object") {
+        // 1. Nếu là định dạng v3 mới (chứa question_highlight hoặc options dạng mảng)
+        if ("question_highlight" in parsed || "options" in parsed) {
+          const qHighlight = (!parsed.question_highlight || isEmptyHTML(parsed.question_highlight))
+            ? (q?.question || "")
+            : parsed.question_highlight;
+
+          return {
+            question_highlight: qHighlight,
+            options: Array.isArray(parsed.options)
+              ? parsed.options.map((opt, idx) => {
+                  const optText = (!opt.text || isEmptyHTML(opt.text))
+                    ? (q?.options?.[idx] || "")
+                    : opt.text;
+                  return {
+                    text: optText,
+                    hint: opt.hint || ""
+                  };
+                })
+              : q?.options?.map(opt => ({ text: opt, hint: "" })) || []
+          };
+        }
+        
+        // 2. Nếu là định dạng v2 cũ (chứa text giải thích chung và highlight riêng lẻ)
+        if ("text" in parsed) {
+          // Bản v2: Gợi ý cũ sẽ được map vào đáp án đúng, các đáp án khác hint rỗng
+          const options = q?.options?.map((opt, idx) => {
+            const isCorrect = opt === q?.answer;
+            const highlightedText = parsed.highlightedOptions?.[idx] || opt;
+            const optText = (!highlightedText || isEmptyHTML(highlightedText)) ? opt : highlightedText;
+            return {
+              text: optText,
+              hint: isCorrect ? parsed.text : ""
+            };
+          }) || [];
+
+          const qHighlight = (!parsed.highlightedQuestion || isEmptyHTML(parsed.highlightedQuestion))
+            ? (q?.question || "")
+            : parsed.highlightedQuestion;
+
+          return {
+            question_highlight: qHighlight,
+            options: options
+          };
+        }
+      }
+    } catch (e) {
+      // Bắt lỗi cú pháp JSON và xử lý như text thuần bên dưới
+    }
+
+    // 3. Nếu hintString chỉ là text giải thích thuần tuý (v1) -> Map gợi ý đó vào đáp án đúng
+    const options = q?.options?.map((opt, idx) => {
+      const isCorrect = opt === q?.answer;
+      return {
+        text: opt,
+        hint: isCorrect ? hintString : ""
+      };
+    }) || [];
+
+    return {
+      question_highlight: q?.question || "",
+      options: options
+    };
+  }, [isEmptyHTML]);
+
+  // Helper cắt bỏ các thẻ HTML để hiển thị chữ thuần tuý
+  const stripHTMLTags = useCallback((html) => {
+    if (!html) return "";
+    return html.replace(/<[^>]*>/g, "");
+  }, []);
+
+  // Áp dụng bôi đen Highlight tạm thời trên các thẻ contentEditable của V3
+  const applyHighlight = useCallback((styleType) => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    
+    let wrapper = document.createElement("span");
+    if (styleType === "strong") {
+      wrapper = document.createElement("strong");
+    } else if (styleType === "red") {
+      wrapper.className = "text-red-500 font-bold";
+      wrapper.style.color = "#ef4444";
+      wrapper.style.fontWeight = "bold";
+    } else if (styleType === "u") {
+      wrapper = document.createElement("u");
+    } else if (styleType === "s") {
+      wrapper = document.createElement("s");
+    } else if (styleType === "clear") {
+      // Xóa định dạng bằng cách tách lấy text node thuần túy
+      const div = document.createElement("div");
+      div.appendChild(range.extractContents());
+      const textContent = div.innerText || div.textContent;
+      const textNode = document.createTextNode(textContent);
+      range.insertNode(textNode);
+      selection.removeAllRanges();
+      setToolbarState(prev => ({ ...prev, show: false }));
+      return;
+    }
+
+    try {
+      range.surroundContents(wrapper);
+    } catch (e) {
+      // Trường hợp bôi đen mixed nodes phức tạp (ví dụ bôi đen trúng thẻ có sẵn)
+      const div = document.createElement("div");
+      div.appendChild(range.extractContents());
+      if (styleType === "strong") {
+        wrapper.innerHTML = `<strong>${div.innerHTML}</strong>`;
+      } else if (styleType === "red") {
+        wrapper.innerHTML = `<span class="text-red-500 font-bold" style="color:#ef4444; font-weight:bold">${div.innerHTML}</span>`;
+      } else if (styleType === "u") {
+        wrapper.innerHTML = `<u>${div.innerHTML}</u>`;
+      } else if (styleType === "s") {
+        wrapper.innerHTML = `<s>${div.innerHTML}</s>`;
+      }
+      range.insertNode(wrapper);
+    }
+
+    selection.removeAllRanges();
+    setToolbarState(prev => ({ ...prev, show: false }));
+  }, []);
+
+  const clearHighlight = () => {
+    applyHighlight("clear");
+  };
+
+  useEffect(() => {
+    setShowHint(false);
+    setShowHintForm(false);
+    setHintInput("");
+    setIsEditingHint(false); // Reset chế độ sửa gợi ý khi đổi câu hỏi
+    setSelectedOptionForEdit(null);
+    setToolbarState({ show: false, top: 0, left: 0, targetType: "", optionIndex: -1 });
+  }, [currentQuestionIndex]);
+
+  // Lắng nghe sự kiện kết thúc bôi đen (mouseup/keyup) trong chế độ Chỉnh sửa Gợi ý & Highlight V3
+  // Giúp tối ưu hóa hiệu năng, triệt tiêu hoàn toàn re-render liên tục gây mất selection và nhảy con trỏ chuột
+  useEffect(() => {
+    if (!isConfigured || showResults || !isEditingHint) {
+      setToolbarState(prev => prev.show ? { ...prev, show: false } : prev);
+      return;
+    }
+
+    const handleSelectionCheck = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+        setToolbarState(prev => prev.show ? { ...prev, show: false } : prev);
+        return;
+      }
+
+      const range = selection.getRangeAt(0);
+      const questionEl = document.getElementById("question-text-content-edit");
+      let validContainer = null;
+      let targetType = "";
+      let optionIndex = -1;
+
+      if (questionEl && questionEl.contains(range.commonAncestorContainer)) {
+        validContainer = questionEl;
+        targetType = "question";
+      } else {
+        const optionsCount = questions[currentQuestionIndex]?.options?.length || 0;
+        for (let i = 0; i < optionsCount; i++) {
+          const optEl = document.getElementById(`option-text-edit-${i}`);
+          if (optEl && optEl.contains(range.commonAncestorContainer)) {
+            validContainer = optEl;
+            targetType = "option";
+            optionIndex = i;
+            break;
+          }
+        }
+      }
+
+      if (!validContainer) {
+        setToolbarState(prev => prev.show ? { ...prev, show: false } : prev);
+        return;
+      }
+
+      const rect = range.getBoundingClientRect();
+      // Sử dụng Fixed Position (tọa độ Viewport) để tối ưu Mobile
+      setToolbarState({
+        show: true,
+        top: Math.max(10, rect.top - 50), // Tránh bị tràn lên trên cùng
+        left: rect.left + (rect.width / 2),
+        targetType: targetType,
+        optionIndex: optionIndex
+      });
+    };
+
+    // Lắng nghe khi người dùng nhả chuột hoặc thả phím để kết thúc quá trình bôi đen
+    document.addEventListener("mouseup", handleSelectionCheck);
+    document.addEventListener("keyup", handleSelectionCheck);
+    return () => {
+      document.removeEventListener("mouseup", handleSelectionCheck);
+      document.removeEventListener("keyup", handleSelectionCheck);
+    };
+  }, [isConfigured, showResults, isEditingHint, currentQuestionIndex, questions]);
 
   // 1. Hàm tải thống kê câu hỏi từ API Turso Database (bảo mật Server-side)
   const fetchQuestionStats = useCallback(async () => {
@@ -154,12 +365,21 @@ const Quiz = ({ params }) => {
     fetchQuestions();
   }, [subject]);
 
-  // 3. Tự động tải lại thống kê câu hỏi mỗi khi người dùng quay lại màn hình Setup (Cấu hình)
   useEffect(() => {
     if (user && !isConfigured) {
       fetchQuestionStats();
     }
   }, [user, isConfigured, fetchQuestionStats]);
+
+  // Khởi chạy chế độ chỉnh sửa gợi ý & highlight v3
+  const handleStartEditHint = useCallback(() => {
+    const currentQ = questions[currentQuestionIndex];
+    if (!currentQ) return;
+    const parsed = parseHint(currentQ.hint_text, currentQ);
+    // Đồng bộ hint hiện có của 4 đáp án vào mảng state hintInputs
+    setHintInputs(parsed.options.map(o => o.hint || ""));
+    setIsEditingHint(true);
+  }, [questions, currentQuestionIndex, parseHint]);
 
   // --- Admin Handlers ---
   const handleDeleteQuestion = async (id) => {
@@ -397,6 +617,74 @@ const Quiz = ({ params }) => {
     }
   }, [currentQuestionIndex, cancelAutoNext, quizProgress]);
 
+  // 3. Xử lý nộp gợi ý giải thích và highlight v3 tổng hợp
+  const handleSubmitHint = useCallback(async () => {
+    const currentQ = questions[currentQuestionIndex];
+    if (!currentQ) return;
+
+    setIsSubmittingHint(true);
+
+    try {
+      // 1. Thu thập Highlight từ DOM các thẻ contentEditable
+      const questionEl = document.getElementById("question-text-content-edit");
+      const questionHighlight = questionEl ? questionEl.innerHTML.trim() : (currentQ.question || "");
+
+      const updatedOptions = currentQ.options.map((opt, index) => {
+        const optEl = document.getElementById(`option-text-edit-${index}`);
+        const optHighlight = optEl ? optEl.innerHTML.trim() : opt;
+        return {
+          text: optHighlight,
+          hint: (hintInputs[index] || "").trim()
+        };
+      });
+
+      // 2. Đóng gói JSON v3 chuẩn
+      const updatedHintObj = {
+        question_highlight: questionHighlight,
+        options: updatedOptions
+      };
+      const updatedHintString = JSON.stringify(updatedHintObj);
+
+      // 3. Gọi API lưu trữ vào DB
+      const res = await fetch(`/api/questions/${currentQ.id}/hint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: user?.isAdmin ? "Admin" : "User",
+          new_hint: updatedHintString,
+          username: user?.username || "Guest"
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Gặp lỗi khi gửi gợi ý giải thích.");
+      }
+
+      // Admin hoặc người dùng đóng góp tự động phê duyệt -> cập nhật ngay React states
+      if (user?.isAdmin || !parseHint(currentQ.hint_text, currentQ).options.some(o => o.hint)) {
+        setQuestions(prev => prev.map((q, idx) => 
+          idx === currentQuestionIndex ? { ...q, hint_text: updatedHintString } : q
+        ));
+        setRawQuestions(prev => prev.map(q => 
+          q.id === currentQ.id ? { ...q, hint_text: updatedHintString } : q
+        ));
+        alert(user?.isAdmin ? "Đã lưu thay đổi gợi ý & highlight thành công!" : "Đóng góp gợi ý & highlight của bạn đã được áp dụng tự động!");
+      } else {
+        alert("Cảm ơn bạn! Đóng góp gợi ý đã được gửi và đang chờ Admin duyệt.");
+      }
+
+      // Tắt chế độ sửa
+      setIsEditingHint(false);
+    } catch (err) {
+      console.error("Lỗi khi submit hint v3:", err);
+      alert(err.message || "Gặp lỗi mạng khi lưu gợi ý.");
+    } finally {
+      setIsSubmittingHint(false);
+    }
+  }, [questions, currentQuestionIndex, hintInputs, parseHint, user]);
+
+
   const handleForceFinish = async () => {
     cancelAutoNext();
 
@@ -422,7 +710,20 @@ const Quiz = ({ params }) => {
   // 2. Xử lý phím tắt bàn phím
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (showResults || !isConfigured) return;
+      // Khóa phím tắt hoàn toàn khi form sửa gợi ý đang hiển thị, chưa cấu hình, hoặc đang ở trang kết quả
+      if (showResults || !isConfigured || showHintForm || selectedOptionForEdit !== null) return;
+
+      // Khóa phím tắt khi đang nhập liệu trong bất kỳ input, textarea hoặc phần tử contenteditable nào khác
+      const activeEl = document.activeElement;
+      if (activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.hasAttribute('contenteditable') ||
+        activeEl.getAttribute('contenteditable') === 'true' ||
+        activeEl.isContentEditable
+      )) {
+        return;
+      }
 
       const key = e.key.toLowerCase();
 
@@ -458,7 +759,8 @@ const Quiz = ({ params }) => {
   }, [
     isConfigured, showResults, currentQuestionIndex, questions,
     autoNextCountdown, isAnswered, selectedOption,
-    handleAnswer, handleNext, handlePrevious, cancelAutoNext
+    handleAnswer, handleNext, handlePrevious, cancelAutoNext,
+    showHintForm, selectedOptionForEdit
   ]);
 
   const handleContainerClick = (e) => {
@@ -836,6 +1138,7 @@ const Quiz = ({ params }) => {
           </div>
 
           {editingQuestion?.id === questions[currentQuestionIndex]?.id ? (
+            // KHỐI GIAO DIỆN CHỈNH SỬA CÂU HỎI TRỰC TIẾP CỦA ADMIN (Inline Edit)
             <div className="bg-white p-6 rounded-2xl shadow border border-blue-200 mb-6 relative z-10">
               <h3 className="font-bold text-lg mb-4 text-blue-800 flex items-center gap-2">
                 <FaPen /> Chỉnh sửa Câu hỏi (Admin)
@@ -876,7 +1179,95 @@ const Quiz = ({ params }) => {
                 <button onClick={() => setEditingQuestion(null)} className="px-6 py-2 bg-slate-300 text-slate-800 font-bold rounded-lg hover:bg-slate-400 transition">Hủy</button>
               </div>
             </div>
+          ) : isEditingHint ? (
+            // KHỐI GIAO DIỆN CHỈNH SỬA HINT & HIGHLIGHT V3 (MỚI TRIỂN KHAI)
+            <div className="flex flex-col gap-6 text-left">
+              {/* 1. Phần Câu hỏi chỉnh sửa */}
+              <div className="p-5 sm:p-6 bg-amber-50/50 border border-amber-200 rounded-2xl shadow-sm leading-relaxed relative">
+                <div className="absolute top-2 right-2 px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] sm:text-xs font-black rounded-full select-none">
+                  Chế độ chỉnh sửa Highlight
+                </div>
+                <div className="text-lg sm:text-xl leading-relaxed flex flex-col gap-2">
+                  <span className="text-black font-black text-2xl mr-2 shrink-0 select-none">Câu {currentQuestionIndex + 1}:</span>
+                  {/* Sử dụng component con EditableContent được bọc React.memo để ngăn chặn re-render mất con trỏ chuột */}
+                  <EditableContent 
+                    id="question-text-content-edit"
+                    className="text-blue-900 font-bold outline-none border-b-2 border-dashed border-amber-300 focus:border-amber-500 w-full min-h-[1.5em] px-2 py-1 bg-white rounded shadow-inner"
+                    initialHtml={parseHint(questions[currentQuestionIndex]?.hint_text, questions[currentQuestionIndex]).question_highlight}
+                  />
+                </div>
+                <p className="text-[10px] sm:text-[11px] text-amber-600 mt-3 font-extrabold select-none leading-normal">
+                  * HƯỚNG DẪN HIGHLIGHT: Bạn hãy bôi đen chữ trong câu hỏi để áp dụng các định dạng (In đậm, Chữ đỏ, Gạch chân, Gạch ngang) từ Floating Toolbar xuất hiện.
+                </p>
+              </div>
+
+              {/* 2. Phần 4 Options & 4 Textareas */}
+              <div className="space-y-6">
+                {questions[currentQuestionIndex]?.options?.map((option, index) => {
+                  const isCorrect = option === questions[currentQuestionIndex].answer;
+                  const parsedData = parseHint(questions[currentQuestionIndex]?.hint_text, questions[currentQuestionIndex]);
+                  return (
+                    <div key={option} className="flex flex-col gap-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-sm relative">
+                      <div className="flex items-center gap-3">
+                        <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${isCorrect ? "bg-green-600 text-white border-green-600 shadow-green-100" : "bg-white text-blue-600 border-blue-100"}`}>
+                          {optionPrefixes[index]}
+                        </span>
+                        {/* Sử dụng component con EditableContent được bọc React.memo để ngăn chặn re-render mất con trỏ chuột */}
+                        <EditableContent 
+                          id={`option-text-edit-${index}`} 
+                          className="flex-1 leading-snug font-bold outline-none border-b-2 border-dashed border-amber-300 focus:border-amber-500 p-2 bg-white rounded shadow-inner"
+                          initialHtml={parsedData.options[index]?.text || option}
+                        />
+                      </div>
+                      
+                      <p className="text-[10px] sm:text-[11px] text-amber-600 ml-12 font-extrabold select-none leading-normal">
+                        * Bôi đen chữ của đáp án để áp dụng Highlight
+                      </p>
+
+                      {/* Textarea nhập hint giải thích riêng cho từng option */}
+                      <div className="mt-2 ml-12">
+                        <label className="block text-[11px] sm:text-xs font-black text-slate-500 mb-1.5 flex items-center gap-1.5 select-none">
+                          <FaBookOpen className="text-blue-500" /> Giải thích gợi ý cho phương án {optionPrefixes[index]} {isCorrect && <span className="text-emerald-600 font-black">(Đáp án đúng)</span>}
+                        </label>
+                        <textarea
+                          className="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none text-slate-800 text-sm font-medium shadow-inner transition"
+                          rows="2"
+                          placeholder={`Giải thích tại sao phương án ${optionPrefixes[index]} đúng/sai...`}
+                          value={hintInputs[index] || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setHintInputs(prev => {
+                              const next = [...prev];
+                              next[index] = val;
+                              return next;
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 3. Nút Lưu / Hủy */}
+              <div className="mt-4 flex gap-4 p-4 bg-amber-50/50 border border-amber-200 rounded-2xl select-none">
+                <button 
+                  onClick={handleSubmitHint} 
+                  disabled={isSubmittingHint}
+                  className="flex-1 py-3 px-6 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-black text-base shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmittingHint ? "Đang lưu thay đổi..." : "Lưu thay đổi"}
+                </button>
+                <button 
+                  onClick={() => { setIsEditingHint(false); setToolbarState(prev => ({ ...prev, show: false })); }} 
+                  className="py-3 px-6 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-black text-base shadow-md transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+              </div>
+            </div>
           ) : (
+            // KHỐI RENDER MẶC ĐỊNH KHI KHÔNG TRONG CHẾ ĐỘ CHỈNH SỬA
             <>
               <div className="text-left p-5 sm:p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm leading-relaxed mb-6 select-none relative group">
                 {user?.isAdmin && (
@@ -887,94 +1278,94 @@ const Quiz = ({ params }) => {
                 )}
                 <p className="text-lg sm:text-xl leading-relaxed flex flex-wrap items-baseline">
                   <span className="text-black font-black text-2xl mr-2 shrink-0 select-none">Câu {currentQuestionIndex + 1}:</span>
-                  <span className="text-blue-900 font-bold">{rawQuestionText}</span>
+                  {isAnswered ? (
+                    <span 
+                      id="question-text-content"
+                      className="text-blue-900 font-bold"
+                      dangerouslySetInnerHTML={{ __html: parseHint(questions[currentQuestionIndex]?.hint_text, questions[currentQuestionIndex]).question_highlight }}
+                    />
+                  ) : (
+                    <span id="question-text-content" className="text-blue-900 font-bold">{stripHTMLTags(questions[currentQuestionIndex]?.question_text || rawQuestionText)}</span>
+                  )}
                 </p>
               </div>
 
               <div className="mt-6 space-y-4">
-                {questions[currentQuestionIndex]?.options?.map((option, index) => (
-                  <button
-                    key={option}
-                    onClick={() => handleAnswer(option)}
-                    disabled={isAnswered}
-                    className={`w-full py-4 px-6 rounded-2xl text-base sm:text-lg font-bold text-left transition-all duration-300 focus:outline-none flex items-center gap-3 border shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
-                        ? "bg-green-600 text-white border-green-600 shadow-green-100"
-                        : isAnswered && option === selectedOption
-                          ? "bg-red-600 text-white border-red-600 shadow-red-100"
-                          : "bg-slate-50 hover:bg-blue-50 hover:border-blue-300 focus:bg-blue-50 text-slate-800 border-slate-200 hover:shadow"
-                      }`}
-                  >
-                    <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
-                        ? "bg-white text-green-600 border-white font-extrabold"
-                        : isAnswered && option === selectedOption
-                          ? "bg-white text-red-600 border-white font-extrabold"
-                          : "bg-white text-blue-600 border-blue-100"
-                      }`}>
-                      {optionPrefixes[index]}
-                    </span>
-                    <span className="flex-1 leading-snug">{option}</span>
-                  </button>
-                ))}
+                {questions[currentQuestionIndex]?.options?.map((option, index) => {
+                  const isCorrect = option === questions[currentQuestionIndex].answer;
+                  const parsedHintData = parseHint(questions[currentQuestionIndex]?.hint_text, questions[currentQuestionIndex]);
+                  return (
+                    <div key={option} className="flex flex-col gap-2">
+                      <button
+                        onClick={() => !isAnswered && handleAnswer(option)}
+                        className={`w-full py-4 px-6 rounded-2xl text-base sm:text-lg font-bold text-left transition-all duration-300 focus:outline-none flex items-center gap-3 border shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
+                            ? "bg-green-600 text-white border-green-600 shadow-green-100"
+                            : isAnswered && option === selectedOption
+                              ? "bg-red-600 text-white border-red-600 shadow-red-100"
+                              : "bg-slate-50 hover:bg-blue-50 hover:border-blue-300 focus:bg-blue-50 text-slate-800 border-slate-200 hover:shadow"
+                          }`}
+                      >
+                        <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-black border transition-all duration-300 shrink-0 shadow-sm ${isAnswered && option === questions[currentQuestionIndex].answer
+                            ? "bg-white text-green-600 border-white font-extrabold"
+                            : isAnswered && option === selectedOption
+                              ? "bg-white text-red-600 border-white font-extrabold"
+                              : "bg-white text-blue-600 border-blue-100"
+                          }`}>
+                          {optionPrefixes[index]}
+                        </span>
+                        <span 
+                          id={`option-text-${index}`} 
+                          className="flex-1 leading-snug"
+                          dangerouslySetInnerHTML={
+                            isAnswered
+                              ? { __html: parsedHintData.options[index]?.text || option }
+                              : undefined
+                          }
+                        >
+                          {!isAnswered ? stripHTMLTags(option) : undefined}
+                        </span>
+                      </button>
+
+                      {/* Hiển thị Gợi ý giải thích của đáp án ĐÚNG tự động */}
+                      {isAnswered && isCorrect && (
+                        <div className="mt-1 mb-2 p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-left text-sm relative z-10 shadow-sm leading-relaxed">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-extrabold text-emerald-800 flex items-center gap-1.5">
+                              <FaBookOpen className="text-emerald-600" /> Gợi ý giải thích đáp án
+                            </span>
+                            <button
+                              onClick={handleStartEditHint}
+                              className="text-xs text-emerald-700 hover:underline font-extrabold flex items-center gap-1 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-full transition"
+                            >
+                              <FaPen size={10} /> Sửa gợi ý & Highlight
+                            </button>
+                          </div>
+                          <div>
+                            {parsedHintData.options[index]?.hint ? (
+                              <p className="text-slate-800 font-medium whitespace-pre-line leading-relaxed text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: parsedHintData.options[index].hint }} />
+                            ) : (
+                              <p className="text-slate-500 italic font-bold">Chưa có gợi ý nào</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Hiển thị giải thích vì sao SAI cho phương án người dùng chọn sai */}
+                      {isAnswered && !isCorrect && parsedHintData.options[index]?.hint && (
+                        <div className="mt-1 mb-2 p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-sm relative z-10 shadow-sm leading-relaxed">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                              <FaBookOpen className="text-blue-500" /> Giải thích vì sao sai
+                            </span>
+                          </div>
+                          <p className="text-slate-700 font-medium whitespace-pre-line leading-relaxed text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: parsedHintData.options[index].hint }} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </>
-          )}
-
-          {isAnswered && (
-            <div className="mt-4">
-              <button 
-                onClick={() => setShowHint(!showHint)}
-                className="text-blue-600 font-bold hover:underline flex items-center gap-2 transition"
-              >
-                <FaBookOpen /> {showHint ? "Ẩn gợi ý đáp án" : "Xem gợi ý giải thích đáp án"}
-              </button>
-              
-              {showHint && (
-                <div className="mt-3 p-5 bg-blue-50 border border-blue-200 rounded-xl">
-                  {questions[currentQuestionIndex].hint_text ? (
-                    <div>
-                      <p className="text-gray-800 font-medium whitespace-pre-line leading-relaxed">
-                        {questions[currentQuestionIndex].hint_text}
-                      </p>
-                      <button 
-                        onClick={() => setShowHintForm(!showHintForm)}
-                        className="mt-3 text-sm text-blue-700 hover:underline font-bold"
-                      >
-                        Đóng góp gợi ý hay hơn?
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-gray-500 italic mb-2">Câu hỏi này chưa có gợi ý giải thích.</p>
-                      <button 
-                        onClick={() => setShowHintForm(!showHintForm)}
-                        className="text-sm text-blue-700 hover:underline font-bold"
-                      >
-                        Bạn có gợi ý nào không? Hãy đóng góp nhé!
-                      </button>
-                    </div>
-                  )}
-
-                  {showHintForm && (
-                    <div className="mt-4 pt-4 border-t border-blue-200">
-                      <textarea
-                        className="w-full p-3 border rounded-lg bg-white focus:ring-2 focus:ring-blue-400 outline-none text-black"
-                        rows="3"
-                        placeholder="Nhập nội dung giải thích đáp án của bạn..."
-                        value={hintInput}
-                        onChange={(e) => setHintInput(e.target.value)}
-                      />
-                      <button 
-                        onClick={handleSubmitHint}
-                        disabled={isSubmittingHint}
-                        className="mt-2 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
-                      >
-                        {isSubmittingHint ? "Đang gửi..." : "Gửi đóng góp"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
           )}
 
           <div className="mt-8 flex flex-col gap-4 select-none">
@@ -1039,6 +1430,26 @@ const Quiz = ({ params }) => {
                 <span>Câu sau</span>
               </div>
             </div>
+
+            {/* Floating Selection Toolbar (Fixed Position) */}
+            {toolbarState.show && (
+              <div
+                className="fixed z-[9999] flex gap-1 bg-slate-800 p-1.5 rounded-lg shadow-2xl transition-all duration-200"
+                style={{
+                  top: `${toolbarState.top}px`,
+                  left: `${toolbarState.left}px`,
+                  transform: "translateX(-50%)",
+                }}
+              >
+                {/* Thêm onMouseDown={(e) => e.preventDefault()} để ngăn chặn sự kiện mặc định cướp lấy focus/selection của trình duyệt khi click */}
+                <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("strong")} className="px-3 py-1.5 text-white hover:bg-slate-700 rounded font-black text-xs" title="In đậm">B</button>
+                <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("red")} className="px-3 py-1.5 text-red-400 hover:bg-slate-700 rounded font-black text-xs" title="Chữ đỏ">Red</button>
+                <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("u")} className="px-3 py-1.5 text-white hover:bg-slate-700 rounded font-black text-xs underline" title="Gạch chân">U</button>
+                <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("s")} className="px-3 py-1.5 text-slate-300 hover:bg-slate-700 rounded font-black text-xs line-through" title="Gạch ngang">S</button>
+                <div className="w-[1px] bg-slate-600 mx-1"></div>
+                <button onMouseDown={(e) => e.preventDefault()} onClick={clearHighlight} className="px-3 py-1.5 text-emerald-400 hover:bg-slate-700 rounded font-bold text-xs" title="Xóa định dạng">Clear</button>
+              </div>
+            )}
           </div>
         </div>
       ) : (
