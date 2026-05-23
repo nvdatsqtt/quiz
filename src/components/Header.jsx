@@ -45,13 +45,33 @@ const Header = () => {
         {user && (
           <div className="flex items-center gap-3 border-l border-gray-700 pl-4 sm:pl-8">
             {user.isAdmin && (
-              <Link 
-                href="/admin/hints"
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-900/50 hover:bg-blue-800/80 text-blue-300 border border-blue-800 rounded-lg text-sm font-bold transition mr-2"
-                title="Duyệt Gợi Ý"
-              >
-                <FaShieldAlt /> Duyệt Gợi ý
-              </Link>
+              <div className="relative group mr-2">
+                <button 
+                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-900/50 hover:bg-blue-800 text-blue-300 border border-blue-800 rounded-lg text-sm font-bold transition shadow-md"
+                >
+                  <FaShieldAlt /> Admin Panel
+                </button>
+                {/* 
+                  Sử dụng phần bọc ngoài có absolute bắt đầu từ 100% chiều cao nút, có pt-2 (padding-top) 
+                  tạo khoảng cách 8px ảo giúp di chuyển chuột không bị mất hover (dead-zone)
+                */}
+                <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
+                    <Link 
+                      href="/admin/questions"
+                      className="block px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white transition"
+                    >
+                      📝 Quản lý câu hỏi
+                    </Link>
+                    <Link 
+                      href="/admin/hints"
+                      className="block px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white border-t border-slate-700 transition"
+                    >
+                      💡 Duyệt Gợi ý
+                  </Link>
+                  </div>
+                </div>
+              </div>
             )}
             <div className="flex flex-col items-end hidden md:flex">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Học viên</span>

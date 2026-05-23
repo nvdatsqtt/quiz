@@ -1,13 +1,8 @@
-/**
- * Tác giả: Nguyễn Văn Đạt | Email: nguyenvandatsqtt@gmail.com
- * Mô tả: Next.js API Route Handler (App Router) xử lý lưu trữ và truy vấn thống kê câu hỏi (Số lần xuất hiện & Số lần làm sai).
- * Hỗ trợ GET (lấy danh sách thống kê) và POST (cập nhật hoặc chèn mới đồng loạt thống kê câu hỏi).
- */
-
 import { NextResponse } from "next/server";
 import client, { initDb } from "@/lib/turso";
 
-// Biến trạng thái để kiểm soát việc chạy hàm khởi tạo database duy nhất 1 lần
+export const dynamic = 'force-dynamic';
+
 let isDbInitialized = false;
 
 async function ensureDb() {
@@ -17,11 +12,11 @@ async function ensureDb() {
   }
 }
 
+const stripHtml = (html) => html ? html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() : '';
+
 /**
- * API GET: Lấy thống kê câu hỏi của học viên hiện tại đối với chủ đề ôn luyện.
- * Tham số URL:
- * - username: Tên đăng nhập học viên
- * - subject: Tên chủ đề ôn luyện
+ * API GET: Lấy thống kê câu hỏi sai & câu hỏi đã gặp của user.
+ * Trả về định dạng tương thích ngược để client hiển thị số câu đã làm (appears_count > 0).
  */
 export async function GET(request) {
   try {
@@ -29,23 +24,74 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username");
-    const subject = searchParams.get("subject");
+    const subjectName = searchParams.get("subject");
 
-    if (!username || !subject) {
+    if (!username || !subjectName) {
       return NextResponse.json(
         { error: "Thiếu tham số bắt buộc username hoặc subject" },
         { status: 400 }
       );
     }
 
-    const query = `
-      SELECT question_text, appears_count, wrong_count 
-      FROM question_stats 
-      WHERE username = ? AND subject = ?
-    `;
-    const result = await client.execute({ sql: query, args: [username, subject] });
+    // 1. Lấy dữ liệu need_practice_questions và encountered_questions từ DB
+    const userResult = await client.execute({
+      sql: "SELECT need_practice_questions, encountered_questions FROM users WHERE username = ?",
+      args: [username]
+    });
+    
+    const userRow = userResult.rows[0];
+    if (!userRow) {
+      return NextResponse.json([]);
+    }
 
-    return NextResponse.json(result.rows);
+    let needPractice = [];
+    try {
+      needPractice = JSON.parse(userRow.need_practice_questions || "[]");
+      if (!Array.isArray(needPractice)) needPractice = [];
+    } catch (e) {
+      needPractice = [];
+    }
+
+    let encountered = [];
+    try {
+      encountered = JSON.parse(userRow.encountered_questions || "[]");
+      if (!Array.isArray(encountered)) encountered = [];
+    } catch (e) {
+      encountered = [];
+    }
+
+    // 2. Lấy danh sách câu hỏi thuộc chủ đề (subject) chỉ định để lọc
+    const qResult = await client.execute({
+      sql: `SELECT q.id, q.question 
+            FROM questions q 
+            JOIN subjects s ON q.subject_id = s.id 
+            WHERE LOWER(s.name) = LOWER(?)`,
+      args: [subjectName]
+    });
+
+    const subjectQuestions = qResult.rows;
+    const statsResponse = [];
+
+    // 3. Gom nhóm tất cả ID đã gặp hoặc đang sai
+    const allIds = Array.from(new Set([
+      ...encountered,
+      ...needPractice.map(item => item.id)
+    ]));
+
+    allIds.forEach(id => {
+      const qMatch = subjectQuestions.find(q => q.id === id);
+      if (qMatch) {
+        const wrongItem = needPractice.find(item => item.id === id);
+        statsResponse.push({
+          id: qMatch.id, // Bổ sung UUID câu hỏi để client đối chiếu tuyệt đối chính xác
+          question_text: qMatch.question,
+          appears_count: 1, // Đã từng gặp ít nhất 1 lần (tracking hoạt động)
+          wrong_count: wrongItem ? wrongItem.wrong_count : 0
+        });
+      }
+    });
+
+    return NextResponse.json(statsResponse);
   } catch (error) {
     console.error("[API GET Question Stats Error]:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -53,69 +99,107 @@ export async function GET(request) {
 }
 
 /**
- * API POST: Cập nhật đồng loạt tiến trình xuất hiện và trả lời sai của câu hỏi.
- * Cấu trúc request body:
- * {
- *   "username": "...",
- *   "subject": "...",
- *   "stats": [
- *     { "question_text": "...", "isCorrect": true/false/null, "isAnswered": true/false }
- *   ]
- * }
+ * API POST: Nhận kết quả lượt thi, lưu vết câu đã gặp & cập nhật câu sai vào JSON
  */
 export async function POST(request) {
   try {
     await ensureDb();
     const data = await request.json();
 
-    const { username, subject, stats } = data;
+    const { username, stats } = data;
 
-    if (!username || !subject || !Array.isArray(stats)) {
+    if (!username || !Array.isArray(stats)) {
       return NextResponse.json(
-        { error: "Dữ liệu yêu cầu không hợp lệ (yêu cầu username, subject và mảng stats)" },
+        { error: "Dữ liệu yêu cầu không hợp lệ" },
         { status: 400 }
       );
     }
 
     if (stats.length === 0) {
-      return NextResponse.json({ success: true, message: "Không có thống kê nào để cập nhật." });
+      return NextResponse.json({ success: true, message: "Không có thống kê để cập nhật." });
     }
 
-    // Sử dụng cơ chế libsql client.batch() để tối ưu hóa việc chạy nhiều truy vấn trong một transaction
-    // [Học tập AI - Điểm tin cậy: 8/10] - Cấu trúc cập nhật trọng số động cho câu hỏi sai (giảm khi trả lời đúng)
-    const transactions = stats.map((s) => {
-      // Tính toán sự thay đổi trọng số (wrongDelta):
-      // - Nếu người dùng trả lời SAI: +1 điểm sai
-      // - Nếu người dùng trả lời ĐÚNG: -1 điểm sai (để giảm dần gánh nặng câu hỏi sai)
-      // - Nếu người dùng không trả lời hoặc bỏ qua: 0
-      let wrongDelta = 0;
-      if (s.isAnswered) {
-        if (s.isCorrect === false) {
-          wrongDelta = 1;
-        } else if (s.isCorrect === true) {
-          wrongDelta = -1;
+    // 1. Lấy danh sách câu hỏi để mapping question_text -> id
+    const allQsResult = await client.execute("SELECT id, question FROM questions");
+    const qMap = {};
+    allQsResult.rows.forEach(q => {
+      if (q.question) {
+        const cleanText = stripHtml(q.question);
+        qMap[cleanText] = q.id;
+        qMap[q.question.trim()] = q.id;
+      }
+    });
+
+    // 2. Lấy dữ liệu stats hiện tại của user
+    const userResult = await client.execute({
+      sql: "SELECT need_practice_questions, encountered_questions FROM users WHERE username = ?",
+      args: [username]
+    });
+
+    const userRow = userResult.rows[0];
+    if (!userRow) {
+      return NextResponse.json({ error: "Không tìm thấy người dùng." }, { status: 404 });
+    }
+
+    let needPractice = [];
+    try {
+      needPractice = JSON.parse(userRow.need_practice_questions || "[]");
+      if (!Array.isArray(needPractice)) needPractice = [];
+    } catch (e) {
+      needPractice = [];
+    }
+
+    let encountered = [];
+    try {
+      encountered = JSON.parse(userRow.encountered_questions || "[]");
+      if (!Array.isArray(encountered)) encountered = [];
+    } catch (e) {
+      encountered = [];
+    }
+
+    // 3. Xử lý cập nhật danh sách thống kê câu hỏi
+    stats.forEach(s => {
+      // Ưu tiên sử dụng ID (UUID) câu hỏi trực tiếp từ client gửi lên để triệt tiêu hoàn toàn lỗi lệch khoảng trắng/HTML
+      const cleanStatText = stripHtml(s.question_text || "");
+      const qId = s.id || qMap[cleanStatText] || qMap[(s.question_text || "").trim()];
+
+      if (!qId) {
+        console.warn(`[Stats Sync Warning]: Không tìm thấy ID cho câu: "${(s.question_text || "").substring(0, 30)}..."`);
+        return;
+      }
+
+      // Ghi nhận câu hỏi đã gặp: khi người dùng đã trả lời (isAnswered) hoặc đã đi qua (isEncountered)
+      if (s.isAnswered || s.isEncountered) {
+        if (!encountered.includes(qId)) {
+          encountered.push(qId);
         }
       }
 
-      // Giá trị sai ban đầu khi chèn mới bản ghi (INSERT)
-      // Không được phép chèn số âm, nếu làm đúng lần đầu tiên thì điểm sai khởi tạo là 0
-      const initialWrong = wrongDelta < 0 ? 0 : wrongDelta;
+      // Chỉ cập nhật tiến trình luyện tập (làm sai/đúng) đối với câu hỏi thực sự đã được trả lời
+      if (s.isAnswered) {
+        const existingIndex = needPractice.findIndex(item => item.id === qId);
 
-      return {
-        sql: `
-          INSERT INTO question_stats (username, subject, question_text, appears_count, wrong_count)
-          VALUES (?, ?, ?, 1, ?)
-          ON CONFLICT(username, subject, question_text)
-          DO UPDATE SET 
-            appears_count = appears_count + 1,
-            wrong_count = CASE WHEN wrong_count + ? < 0 THEN 0 ELSE wrong_count + ? END
-        `,
-        args: [username, subject, s.question_text, initialWrong, wrongDelta, wrongDelta],
-      };
+        if (s.isCorrect === false) {
+          // Trả lời SAI -> Cộng wrong_count
+          if (existingIndex > -1) {
+            needPractice[existingIndex].wrong_count += 1;
+          } else {
+            needPractice.push({ id: qId, wrong_count: 1 });
+          }
+        } else if (s.isCorrect === true) {
+          // Trả lời ĐÚNG -> Xóa vĩnh viễn khỏi danh sách câu sai
+          if (existingIndex > -1) {
+            needPractice.splice(existingIndex, 1);
+          }
+        }
+      }
     });
 
-    // Thực hiện batch transaction
-    await client.batch(transactions);
+    // 4. Lưu lại cả hai mảng JSON vào DB
+    await client.execute({
+      sql: "UPDATE users SET need_practice_questions = ?, encountered_questions = ? WHERE username = ?",
+      args: [JSON.stringify(needPractice), JSON.stringify(encountered), username]
+    });
 
     return NextResponse.json({ success: true, count: stats.length });
   } catch (error) {

@@ -30,12 +30,80 @@ async function ensureDb() {
  */
 export async function GET(request) {
   try {
-    // Đảm bảo bảng đã tồn tại
     await ensureDb();
 
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username");
     const subject = searchParams.get("subject");
+    const id = searchParams.get("id");
+
+    // Nếu truyền id: Lấy chi tiết 1 lượt thi kèm toàn bộ đề thi thực tế
+    if (id) {
+      const historyResult = await client.execute({
+        sql: "SELECT * FROM quiz_history WHERE id = ?",
+        args: [id]
+      });
+
+      const record = historyResult.rows[0];
+      if (!record) {
+        return NextResponse.json({ error: "Không tìm thấy lịch sử lượt thi này" }, { status: 404 });
+      }
+
+      let detailedQuestions = [];
+      if (record.list_questions) {
+        let listQuestions = [];
+        try {
+          listQuestions = JSON.parse(record.list_questions);
+        } catch (e) {
+          listQuestions = [];
+        }
+
+        if (listQuestions.length > 0) {
+          // Lấy tất cả câu hỏi tương ứng trong CSDL
+          const placeholders = listQuestions.map(() => "?").join(",");
+          const ids = listQuestions.map(item => item.id);
+
+          const qResult = await client.execute({
+            sql: `SELECT * FROM questions WHERE id IN (${placeholders})`,
+            args: ids
+          });
+
+          const questionsMap = {};
+          qResult.rows.forEach(q => {
+            questionsMap[q.id] = {
+              ...q,
+              options: JSON.parse(q.options)
+            };
+          });
+
+          // Lắp ghép chi tiết và thứ tự câu hỏi đúng như lúc thi
+          detailedQuestions = listQuestions.map(item => {
+            const qDetail = questionsMap[item.id];
+            if (qDetail) {
+              return {
+                ...qDetail,
+                user_selected: item.selected // -1 hoặc index đáp án (0-3)
+              };
+            } else {
+              // Xử lý Hard Delete: Câu hỏi đã bị xoá khỏi CSDL
+              return {
+                id: item.id,
+                question: "Câu hỏi này đã bị xoá khỏi ngân hàng đề.",
+                options: [],
+                answer: "",
+                user_selected: item.selected,
+                is_deleted: true
+              };
+            }
+          });
+        }
+      }
+
+      return NextResponse.json({
+        history: record,
+        questions: detailedQuestions
+      });
+    }
 
     let query = "SELECT * FROM quiz_history";
     const params = [];
@@ -57,7 +125,6 @@ export async function GET(request) {
 
     const result = await client.execute({ sql: query, args: params });
     
-    // Trả về dữ liệu dạng JSON cho phía Client
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error("[API GET History Error]:", error);
@@ -84,7 +151,8 @@ export async function POST(request) {
       wrongAnswers,
       unattemptedQuestions,
       timeSpent,
-      averageTime
+      averageTime,
+      list_questions
     } = data;
 
     // Kiểm tra dữ liệu đầu vào bắt buộc
@@ -97,8 +165,8 @@ export async function POST(request) {
       sql: `
         INSERT INTO quiz_history (
           id, username, subject, date, score, totalQuestions, 
-          correctAnswers, wrongAnswers, unattemptedQuestions, timeSpent, averageTime
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          correctAnswers, wrongAnswers, unattemptedQuestions, timeSpent, averageTime, list_questions
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       args: [
         id,
@@ -111,7 +179,8 @@ export async function POST(request) {
         wrongAnswers,
         unattemptedQuestions,
         timeSpent,
-        averageTime
+        averageTime,
+        list_questions ? JSON.stringify(list_questions) : null
       ]
     });
 

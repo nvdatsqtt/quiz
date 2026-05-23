@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { 
   FaHistory, 
   FaCalendarAlt, 
@@ -142,6 +143,7 @@ const HistorySection = ({ currentUser, subjectFilter = null }) => {
                 <th className="py-4 px-5">Tỷ lệ</th>
                 <th className="py-4 px-5">Điểm</th>
                 <th className="py-4 px-5 text-center">Đánh giá</th>
+                <th className="py-4 px-5 text-center">Xem lại</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -207,6 +209,18 @@ const HistorySection = ({ currentUser, subjectFilter = null }) => {
                       <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border ${ratingColor} uppercase tracking-tight`}>
                         {ratingLabel}
                       </span>
+                    </td>
+                    <td className="py-4 px-5 text-center">
+                      {record.list_questions ? (
+                        <Link 
+                          href={`/quiz/history/${record.id}`}
+                          className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-xl text-xs font-bold transition-all inline-block"
+                        >
+                          Chi tiết
+                        </Link>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 font-medium italic">Không hỗ trợ</span>
+                      )}
                     </td>
                   </tr>
                 );

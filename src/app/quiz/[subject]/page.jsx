@@ -328,6 +328,14 @@ const Quiz = ({ params }) => {
         // Chuyển danh sách dữ liệu từ DB thành Map Object để tra cứu cực nhanh O(1)
         const statsMap = {};
         data.forEach((item) => {
+          // Hỗ trợ tra cứu kép: dùng cả UUID câu hỏi làm key chính để đạt độ chính xác tuyệt đối
+          if (item.id) {
+            statsMap[item.id] = {
+              appears_count: item.appears_count,
+              wrong_count: item.wrong_count,
+            };
+          }
+          // Giữ lại tương thích ngược với câu hỏi thô dạng văn bản
           statsMap[item.question_text] = {
             appears_count: item.appears_count,
             wrong_count: item.wrong_count,
@@ -449,6 +457,15 @@ const Quiz = ({ params }) => {
   const saveResultToHistory = useCallback(async (overrideUnattempted, overrideTimeSpent) => {
     if (!user) return; // Bảo vệ nếu user chưa được tải
 
+    const list_questions = questions.map((q, idx) => {
+      const progress = quizProgress[idx];
+      const selectedIndex = progress && progress.isAnswered ? q.options.indexOf(progress.selectedOption) : -1;
+      return {
+        id: q.id,
+        selected: selectedIndex
+      };
+    });
+
     const record = {
       id: Date.now().toString(),
       username: user.username,
@@ -460,7 +477,8 @@ const Quiz = ({ params }) => {
       wrongAnswers: wrongAnswers,
       unattemptedQuestions: overrideUnattempted !== undefined ? overrideUnattempted : unattemptedQuestions,
       timeSpent: overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent,
-      averageTime: ((overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent) / questions.length).toFixed(1)
+      averageTime: ((overrideTimeSpent !== undefined ? overrideTimeSpent : totalTimeSpent) / questions.length).toFixed(1),
+      list_questions: list_questions
     };
 
     try {
@@ -479,7 +497,7 @@ const Quiz = ({ params }) => {
     } catch (err) {
       console.error("[Turso Database Error]: Lỗi mạng khi cố gắng lưu lịch sử thi:", err);
     }
-  }, [user, subject, points, questions.length, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
+  }, [user, subject, points, questions, quizProgress, correctAnswers, wrongAnswers, unattemptedQuestions, totalTimeSpent]);
 
   // 4. Hàm đồng bộ thống kê tần suất xuất hiện và số lần làm sai của từng câu hỏi lên Turso Database
   const saveQuestionStats = useCallback(async () => {
@@ -489,9 +507,11 @@ const Quiz = ({ params }) => {
     const stats = questions.map((q, idx) => {
       const progress = quizProgress[idx];
       return {
+        id: q.id, // Gửi kèm UUID câu hỏi trực tiếp lên API để đối chiếu an toàn tuyệt đối
         question_text: q.question,
         isCorrect: progress ? progress.isCorrect : null, // true nếu đúng, false nếu sai, null nếu chưa làm/bỏ qua
         isAnswered: progress ? progress.isAnswered : false, // true nếu đã chọn đáp án, false nếu bỏ qua
+        isEncountered: progress !== undefined, // Đánh dấu đã gặp nếu người dùng đã thực sự đi qua câu hỏi này (làm hoặc bỏ qua)
       };
     });
 
@@ -815,36 +835,50 @@ const Quiz = ({ params }) => {
     if (practiceMode === "wrong") {
       // 1. Chế độ ôn tập câu hay sai:
       // Lọc ra các câu hỏi trong ngân hàng mà học viên này từng trả lời sai (wrong_count > 0)
-      const wrongQuestions = rawQuestions.filter(q => (questionStatsMap[q.question]?.wrong_count || 0) > 0);
+      const wrongQuestions = rawQuestions.filter(q => {
+        const wrongCount = (questionStatsMap[q.id] || questionStatsMap[q.question])?.wrong_count || 0;
+        return wrongCount > 0;
+      });
       
+      // Gán trọng số ngẫu nhiên cố định để đảm bảo phép sắp xếp trong Javascript luôn nhất quán và ổn định
+      const wrongWithRandom = wrongQuestions.map(q => ({
+        q,
+        wrong: (questionStatsMap[q.id] || questionStatsMap[q.question])?.wrong_count || 0,
+        rand: Math.random()
+      }));
+
       // Sắp xếp theo số lần làm sai giảm dần (câu sai nhiều nhất lên trước)
-      // Nếu bằng nhau, áp dụng xáo trộn ngẫu nhiên
-      const sortedWrong = [...wrongQuestions].sort((a, b) => {
-        const wrongA = questionStatsMap[a.question]?.wrong_count || 0;
-        const wrongB = questionStatsMap[b.question]?.wrong_count || 0;
-        if (wrongB !== wrongA) {
-          return wrongB - wrongA;
+      // Nếu bằng nhau, áp dụng xáo trộn ngẫu nhiên ổn định qua trọng số rand
+      wrongWithRandom.sort((a, b) => {
+        if (b.wrong !== a.wrong) {
+          return b.wrong - a.wrong;
         }
-        return Math.random() - 0.5;
+        return a.rand - b.rand;
       });
       
       // Cắt lấy số lượng câu hỏi theo cấu hình slider (giới hạn bằng tổng số câu sai có sẵn)
-      const limit = Math.min(selectedQuestionCount, sortedWrong.length);
-      selectedQuestions = sortedWrong.slice(0, limit);
+      const limit = Math.min(selectedQuestionCount, wrongWithRandom.length);
+      selectedQuestions = wrongWithRandom.slice(0, limit).map(item => item.q);
     } else {
       // 2. Chế độ thông thường: Ưu tiên các câu hỏi ít xuất hiện hơn để phủ khắp ngân hàng đề
-      // Sắp xếp câu hỏi theo số lần xuất hiện (appears_count) tăng dần
-      // Nếu số lần xuất hiện bằng nhau, xáo trộn ngẫu nhiên
-      const sortedByAppears = [...rawQuestions].sort((a, b) => {
-        const appearsA = questionStatsMap[a.question]?.appears_count || 0;
-        const appearsB = questionStatsMap[b.question]?.appears_count || 0;
-        if (appearsA !== appearsB) {
-          return appearsA - appearsB;
+      // Gán trọng số ngẫu nhiên cố định để đảm bảo phép sắp xếp luôn nhất quán và ổn định
+      const rawWithRandom = rawQuestions.map(q => ({
+        q,
+        appears: (questionStatsMap[q.id] || questionStatsMap[q.question])?.appears_count || 0,
+        rand: Math.random()
+      }));
+
+      // Sắp xếp câu hỏi theo số lần xuất hiện (appears_count) tăng dần (0 là chưa gặp, 1 là đã gặp)
+      // Các câu hỏi chưa gặp (appears = 0) luôn được xếp lên trước các câu hỏi đã gặp (appears = 1)
+      // Nếu số lần xuất hiện bằng nhau, xáo trộn ngẫu nhiên ổn định qua trọng số rand
+      rawWithRandom.sort((a, b) => {
+        if (a.appears !== b.appears) {
+          return a.appears - b.appears;
         }
-        return Math.random() - 0.5;
+        return a.rand - b.rand;
       });
       
-      selectedQuestions = sortedByAppears.slice(0, selectedQuestionCount);
+      selectedQuestions = rawWithRandom.slice(0, selectedQuestionCount).map(item => item.q);
     }
 
     // Xáo trộn ngẫu nhiên thứ tự các đáp án cho từng câu hỏi được chọn để tránh học vẹt
@@ -868,8 +902,8 @@ const Quiz = ({ params }) => {
   };
 
   // --- TÍNH TOÁN CÁC BIẾN PHỤ TRỢ THỐNG KÊ (ĐẶT SAU TẤT CẢ CÁC HOOKS) ---
-  const wrongQuestionsList = rawQuestions.filter(q => (questionStatsMap[q.question]?.wrong_count || 0) > 0);
-  const answeredQuestionsCount = rawQuestions.filter(q => (questionStatsMap[q.question]?.appears_count || 0) > 0).length;
+  const wrongQuestionsList = rawQuestions.filter(q => ((questionStatsMap[q.id] || questionStatsMap[q.question])?.wrong_count || 0) > 0);
+  const answeredQuestionsCount = rawQuestions.filter(q => ((questionStatsMap[q.id] || questionStatsMap[q.question])?.appears_count || 0) > 0).length;
 
   // Hàm chuyển đổi chế độ làm bài và điều chỉnh slider tương ứng tránh vượt quá giới hạn
   const handleModeChange = (mode) => {
