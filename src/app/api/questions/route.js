@@ -1,5 +1,7 @@
 import client, { initDb } from "@/lib/turso";
 
+export const dynamic = 'force-dynamic'; // Ngăn chặn Next.js cache tĩnh API này để luôn lấy dữ liệu mới nhất từ Turso DB
+
 export async function GET() {
   try {
     await initDb();

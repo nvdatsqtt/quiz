@@ -18,11 +18,18 @@ export function hashPassword(password) {
   return crypto.createHash('sha256').update(password + salt).digest('hex');
 }
 
+// Sử dụng biến toàn cục NodeJS để tránh việc khởi tạo lại bảng trùng lặp khi chạy Next.js Hot Module Replacement (HMR) reload và Serverless environments
+let isDbInitialized = global.isDbInitialized || false;
+
 /**
  * Hàm khởi tạo bảng quiz_history trong cơ sở dữ liệu nếu bảng này chưa tồn tại.
  * Giúp tự động thiết lập schema mà không cần chạy lệnh SQL thủ công từ Dashboard.
  */
 export async function initDb() {
+  if (isDbInitialized) {
+    return; // Đã khởi tạo thành công trong process NodeJS này, bỏ qua để tối ưu hóa tốc độ phản hồi API và giảm số lượt truy vấn SQL lãng phí
+  }
+
   try {
     // Bảng người dùng
     await client.execute(`
@@ -109,6 +116,10 @@ export async function initDb() {
       );
     `);
     console.log("[Turso Database]: Đã kiểm tra và khởi tạo bảng question_stats thành công!");
+
+    // Đánh dấu đã khởi tạo thành công để không chạy lại nữa trong process hiện tại
+    isDbInitialized = true;
+    global.isDbInitialized = true;
   } catch (err) {
     console.error("[Turso Database Error]: Lỗi khi tự động khởi tạo bảng:", err);
   }

@@ -98,8 +98,14 @@ const Quiz = ({ params }) => {
     return cleanText === "";
   }, []);
 
+  // Helper cắt bỏ các thẻ HTML để hiển thị chữ thuần tuý
+  const stripHTMLTags = useCallback((html) => {
+    if (!html) return "";
+    return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+  }, []);
+
   // Helper an toàn phân tách text gợi ý và highlight theo kiến trúc V3 (Tương thích ngược hoàn hảo)
-  // Tác giả: Nguyễn Văn Đạt | Đảm bảo an toàn dữ liệu, tự động fallback về văn bản gốc nếu highlight trống
+  // Tác giả: Nguyễn Văn Đạt | Đảm bảo an toàn dữ liệu và giải quyết triệt để lỗi xáo trộn đáp án bằng thuật toán so khớp nội dung văn bản gốc
   const parseHint = useCallback((hintString, q) => {
     // Cấu trúc mặc định nếu không có dữ liệu gợi ý (DB bảng questions sử dụng trường question)
     const defaultStructure = {
@@ -118,28 +124,33 @@ const Quiz = ({ params }) => {
             ? (q?.question || "")
             : parsed.question_highlight;
 
+          // Giải quyết lỗi lệch index do xáo trộn đáp án: So khớp phương án theo text thuần
+          const mappedOptions = q?.options?.map((opt) => {
+            const optClean = stripHTMLTags(opt);
+            const foundSavedOpt = parsed.options?.find(
+              (o) => stripHTMLTags(o.text || "") === optClean
+            );
+            return {
+              text: foundSavedOpt ? foundSavedOpt.text : opt,
+              hint: foundSavedOpt ? foundSavedOpt.hint : ""
+            };
+          }) || [];
+
           return {
             question_highlight: qHighlight,
-            options: Array.isArray(parsed.options)
-              ? parsed.options.map((opt, idx) => {
-                  const optText = (!opt.text || isEmptyHTML(opt.text))
-                    ? (q?.options?.[idx] || "")
-                    : opt.text;
-                  return {
-                    text: optText,
-                    hint: opt.hint || ""
-                  };
-                })
-              : q?.options?.map(opt => ({ text: opt, hint: "" })) || []
+            options: mappedOptions
           };
         }
         
         // 2. Nếu là định dạng v2 cũ (chứa text giải thích chung và highlight riêng lẻ)
         if ("text" in parsed) {
-          // Bản v2: Gợi ý cũ sẽ được map vào đáp án đúng, các đáp án khác hint rỗng
-          const options = q?.options?.map((opt, idx) => {
+          const options = q?.options?.map((opt) => {
             const isCorrect = opt === q?.answer;
-            const highlightedText = parsed.highlightedOptions?.[idx] || opt;
+            const optClean = stripHTMLTags(opt);
+            // Tìm trong highlightedOptions phần tử nào có text thuần trùng khớp
+            const highlightedText = parsed.highlightedOptions?.find(
+              (hOpt) => stripHTMLTags(hOpt || "") === optClean
+            ) || opt;
             const optText = (!highlightedText || isEmptyHTML(highlightedText)) ? opt : highlightedText;
             return {
               text: optText,
@@ -162,7 +173,7 @@ const Quiz = ({ params }) => {
     }
 
     // 3. Nếu hintString chỉ là text giải thích thuần tuý (v1) -> Map gợi ý đó vào đáp án đúng
-    const options = q?.options?.map((opt, idx) => {
+    const options = q?.options?.map((opt) => {
       const isCorrect = opt === q?.answer;
       return {
         text: opt,
@@ -174,13 +185,7 @@ const Quiz = ({ params }) => {
       question_highlight: q?.question || "",
       options: options
     };
-  }, [isEmptyHTML]);
-
-  // Helper cắt bỏ các thẻ HTML để hiển thị chữ thuần tuý
-  const stripHTMLTags = useCallback((html) => {
-    if (!html) return "";
-    return html.replace(/<[^>]*>/g, "");
-  }, []);
+  }, [isEmptyHTML, stripHTMLTags]);
 
   // Áp dụng bôi đen Highlight tạm thời trên các thẻ contentEditable của V3
   const applyHighlight = useCallback((styleType) => {
@@ -371,15 +376,7 @@ const Quiz = ({ params }) => {
     }
   }, [user, isConfigured, fetchQuestionStats]);
 
-  // Khởi chạy chế độ chỉnh sửa gợi ý & highlight v3
-  const handleStartEditHint = useCallback(() => {
-    const currentQ = questions[currentQuestionIndex];
-    if (!currentQ) return;
-    const parsed = parseHint(currentQ.hint_text, currentQ);
-    // Đồng bộ hint hiện có của 4 đáp án vào mảng state hintInputs
-    setHintInputs(parsed.options.map(o => o.hint || ""));
-    setIsEditingHint(true);
-  }, [questions, currentQuestionIndex, parseHint]);
+
 
   // --- Admin Handlers ---
   const handleDeleteQuestion = async (id) => {
@@ -434,6 +431,20 @@ const Quiz = ({ params }) => {
     }
     setAutoNextCountdown(null);
   }, []);
+
+  // Khởi chạy chế độ chỉnh sửa gợi ý & highlight v3
+  const handleStartEditHint = useCallback(() => {
+    const currentQ = questions[currentQuestionIndex];
+    if (!currentQ) return;
+
+    // Hủy bỏ việc tự động chuyển câu tiếp theo nếu đang đếm ngược (khi làm đúng)
+    cancelAutoNext();
+
+    const parsed = parseHint(currentQ.hint_text, currentQ);
+    // Đồng bộ hint hiện có của 4 đáp án vào mảng state hintInputs
+    setHintInputs(parsed.options.map(o => o.hint || ""));
+    setIsEditingHint(true);
+  }, [questions, currentQuestionIndex, parseHint, cancelAutoNext]);
 
   const saveResultToHistory = useCallback(async (overrideUnattempted, overrideTimeSpent) => {
     if (!user) return; // Bảo vệ nếu user chưa được tải
@@ -669,12 +680,9 @@ const Quiz = ({ params }) => {
         setRawQuestions(prev => prev.map(q => 
           q.id === currentQ.id ? { ...q, hint_text: updatedHintString } : q
         ));
-        alert(user?.isAdmin ? "Đã lưu thay đổi gợi ý & highlight thành công!" : "Đóng góp gợi ý & highlight của bạn đã được áp dụng tự động!");
-      } else {
-        alert("Cảm ơn bạn! Đóng góp gợi ý đã được gửi và đang chờ Admin duyệt.");
       }
 
-      // Tắt chế độ sửa
+      // Tự động tắt chế độ chỉnh sửa gợi ý và quay trở lại màn hình câu hỏi ngay lập tức mà không hiển thị popup thông báo (giúp UX mượt mà hơn)
       setIsEditingHint(false);
     } catch (err) {
       console.error("Lỗi khi submit hint v3:", err);
@@ -764,18 +772,23 @@ const Quiz = ({ params }) => {
   ]);
 
   const handleContainerClick = (e) => {
+    // Nếu click trúng bất kỳ button, textarea, input, hoặc vùng contenteditable nào -> Bỏ qua không tự chuyển câu
+    if (
+      e.target.closest("button") ||
+      e.target.closest("textarea") ||
+      e.target.closest("input") ||
+      e.target.closest("[contenteditable]")
+    ) {
+      return;
+    }
+
     if (autoNextCountdown !== null) {
-      if (e.target.closest("button") && e.target.closest("button").innerText.includes("Đang chuyển")) {
-        return;
-      }
       cancelAutoNext();
       return;
     }
 
     if (isAnswered && selectedOption !== questions[currentQuestionIndex]?.answer) {
-      if (e.target.closest("button") && e.target.closest("button").innerText.includes("Câu hỏi tiếp theo")) {
-        return;
-      }
+      // Bấm vào vùng trống thực tế khi làm sai sẽ chuyển câu
       handleNext();
     }
   };
@@ -1334,7 +1347,10 @@ const Quiz = ({ params }) => {
                               <FaBookOpen className="text-emerald-600" /> Gợi ý giải thích đáp án
                             </span>
                             <button
-                              onClick={handleStartEditHint}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Ngăn chặn nổi bọt sự kiện click lên container cha gây chuyển câu hỏi
+                                handleStartEditHint();
+                              }}
                               className="text-xs text-emerald-700 hover:underline font-extrabold flex items-center gap-1 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-full transition"
                             >
                               <FaPen size={10} /> Sửa gợi ý & Highlight
