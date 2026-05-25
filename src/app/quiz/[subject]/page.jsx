@@ -739,7 +739,7 @@ const Quiz = ({ params }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Khóa phím tắt hoàn toàn khi form sửa gợi ý đang hiển thị, chưa cấu hình, hoặc đang ở trang kết quả
-      if (showResults || !isConfigured || showHintForm || selectedOptionForEdit !== null) return;
+      if (showResults || !isConfigured || showHintForm || selectedOptionForEdit !== null || isEditingHint) return;
 
       // Khóa phím tắt khi đang nhập liệu trong bất kỳ input, textarea hoặc phần tử contenteditable nào khác
       const activeEl = document.activeElement;
@@ -788,7 +788,7 @@ const Quiz = ({ params }) => {
     isConfigured, showResults, currentQuestionIndex, questions,
     autoNextCountdown, isAnswered, selectedOption,
     handleAnswer, handleNext, handlePrevious, cancelAutoNext,
-    showHintForm, selectedOptionForEdit
+    showHintForm, selectedOptionForEdit, isEditingHint
   ]);
 
   const handleContainerClick = (e) => {
@@ -898,6 +898,7 @@ const Quiz = ({ params }) => {
     setTotalTimeSpent(0);
     setTimePerQuestion(0);
     setPoints(0);
+    setQuizProgress({});
     setIsConfigured(true);
   };
 
@@ -1229,6 +1230,46 @@ const Quiz = ({ params }) => {
           ) : isEditingHint ? (
             // KHỐI GIAO DIỆN CHỈNH SỬA HINT & HIGHLIGHT V3 (MỚI TRIỂN KHAI)
             <div className="flex flex-col gap-6 text-left">
+              {/* Sticky Formatting Toolbar cố định — Tối ưu Mobile, chặn cướp selection */}
+              <div className="sticky top-0 z-50 flex flex-wrap items-center gap-1.5 p-3 bg-slate-800 rounded-xl shadow-lg select-none"
+                onMouseDown={(e) => e.preventDefault()}
+                onTouchStart={(e) => e.preventDefault()}
+              >
+                <span className="text-white text-[10px] sm:text-xs font-black mr-2 tracking-wider">ĐỊNH DẠNG:</span>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onClick={() => applyHighlight("strong")}
+                  className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-black text-xs transition"
+                  title="In đậm (Ctrl+B)">B</button>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onClick={() => applyHighlight("red")}
+                  className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-red-400 rounded-lg font-black text-xs transition"
+                  title="Chữ đỏ">Red</button>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onClick={() => applyHighlight("u")}
+                  className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-black text-xs underline transition"
+                  title="Gạch chân (Ctrl+U)">U</button>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onClick={() => applyHighlight("s")}
+                  className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg font-black text-xs line-through transition"
+                  title="Gạch ngang">S</button>
+                <div className="w-[1px] h-5 bg-slate-600 mx-1"></div>
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
+                  onClick={clearHighlight}
+                  className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-emerald-400 rounded-lg font-bold text-xs transition"
+                  title="Xóa định dạng">Clear</button>
+                <span className="text-slate-400 text-[9px] ml-auto hidden sm:inline">Bôi đen chữ → nhấn nút định dạng</span>
+              </div>
+
               {/* 1. Phần Câu hỏi chỉnh sửa */}
               <div className="p-5 sm:p-6 bg-amber-50/50 border border-amber-200 rounded-2xl shadow-sm leading-relaxed relative">
                 <div className="absolute top-2 right-2 px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] sm:text-xs font-black rounded-full select-none">
@@ -1418,6 +1459,7 @@ const Quiz = ({ params }) => {
             </>
           )}
 
+          {!isEditingHint && (
           <div className="mt-8 flex flex-col gap-4 select-none">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
@@ -1481,7 +1523,7 @@ const Quiz = ({ params }) => {
               </div>
             </div>
 
-            {/* Floating Selection Toolbar (Fixed Position) */}
+            {/* Floating Selection Toolbar (Fixed Position) — chỉ hiển thị khi KHÔNG ở chế độ edit hint */}
             {toolbarState.show && (
               <div
                 className="fixed z-[9999] flex gap-1 bg-slate-800 p-1.5 rounded-lg shadow-2xl transition-all duration-200"
@@ -1491,7 +1533,6 @@ const Quiz = ({ params }) => {
                   transform: "translateX(-50%)",
                 }}
               >
-                {/* Thêm onMouseDown={(e) => e.preventDefault()} để ngăn chặn sự kiện mặc định cướp lấy focus/selection của trình duyệt khi click */}
                 <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("strong")} className="px-3 py-1.5 text-white hover:bg-slate-700 rounded font-black text-xs" title="In đậm">B</button>
                 <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("red")} className="px-3 py-1.5 text-red-400 hover:bg-slate-700 rounded font-black text-xs" title="Chữ đỏ">Red</button>
                 <button onMouseDown={(e) => e.preventDefault()} onClick={() => applyHighlight("u")} className="px-3 py-1.5 text-white hover:bg-slate-700 rounded font-black text-xs underline" title="Gạch chân">U</button>
@@ -1501,6 +1542,7 @@ const Quiz = ({ params }) => {
               </div>
             )}
           </div>
+          )}
         </div>
       ) : (
         <Results

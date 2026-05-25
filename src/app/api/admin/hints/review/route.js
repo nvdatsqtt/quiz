@@ -27,7 +27,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { role, questionId, action, hintStatus } = body; // action: 'approve' hoặc 'reject'
+    const { role, questionId, action, hintStatus, updatedHintText } = body; // action: 'approve', 'reject' hoặc 'update'
 
     if (role !== 'Admin') {
       return new Response(JSON.stringify({ error: "Không có quyền thực hiện." }), { 
@@ -36,16 +36,33 @@ export async function POST(request) {
     }
 
     if (action === 'approve') {
+      // Nếu Admin có sửa nội dung trước khi duyệt
+      const finalHintText = updatedHintText || null;
+
       if (hintStatus === 'pending') {
-        await client.execute({
-          sql: `UPDATE questions SET hint_text = hint_pending_text, hint_status = 'approved', hint_pending_text = NULL WHERE id = ?`,
-          args: [questionId]
-        });
+        if (finalHintText) {
+          await client.execute({
+            sql: `UPDATE questions SET hint_text = ?, hint_status = 'approved', hint_pending_text = NULL WHERE id = ?`,
+            args: [finalHintText, questionId]
+          });
+        } else {
+          await client.execute({
+            sql: `UPDATE questions SET hint_text = hint_pending_text, hint_status = 'approved', hint_pending_text = NULL WHERE id = ?`,
+            args: [questionId]
+          });
+        }
       } else if (hintStatus === 'auto_accepted') {
-        await client.execute({
-          sql: `UPDATE questions SET hint_status = 'approved' WHERE id = ?`,
-          args: [questionId]
-        });
+        if (finalHintText) {
+          await client.execute({
+            sql: `UPDATE questions SET hint_text = ?, hint_status = 'approved' WHERE id = ?`,
+            args: [finalHintText, questionId]
+          });
+        } else {
+          await client.execute({
+            sql: `UPDATE questions SET hint_status = 'approved' WHERE id = ?`,
+            args: [questionId]
+          });
+        }
       }
     } else if (action === 'reject') {
       if (hintStatus === 'pending') {
