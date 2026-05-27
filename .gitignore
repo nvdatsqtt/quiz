@@ -36,6 +36,9 @@ yarn-error.log*
 next-env.d.ts
 
 # AI
-docs/
-.agents/
+backups
+docs
 .antigravitycli/
+.env*
+.agents
+.commandcode

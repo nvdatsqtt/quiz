@@ -68,7 +68,22 @@ const Header = () => {
                       className="block px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-700 hover:text-white border-t border-slate-700 transition"
                     >
                       💡 Duyệt Gợi ý
-                  </Link>
+                    </Link>
+                    <button 
+                      onClick={async () => {
+                        if (!confirm("Bạn có chắc chắn muốn chuẩn hóa dữ liệu thống kê?")) return;
+                        try {
+                          const res = await fetch("/api/admin/normalize-stats?role=Admin", { method: "POST" });
+                          const data = await res.json();
+                          alert(data.message || data.error);
+                        } catch (e) {
+                          alert("Lỗi mạng khi chuẩn hóa.");
+                        }
+                      }}
+                      className="w-full text-left block px-4 py-2.5 text-xs font-bold text-yellow-300 hover:bg-slate-700 hover:text-yellow-100 border-t border-slate-700 transition"
+                    >
+                      ⚡ Chuẩn hoá dữ liệu
+                    </button>
                   </div>
                 </div>
               </div>

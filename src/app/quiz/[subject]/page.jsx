@@ -733,6 +733,18 @@ const Quiz = ({ params }) => {
   const handleRestartSetup = () => {
     setIsConfigured(false);
     setShowResults(false);
+    // Reset all tracking states
+    setCurrentQuestionIndex(0);
+    setQuizProgress({});
+    setCorrectAnswers(0);
+    setWrongAnswers(0);
+    setUnattemptedQuestions(0);
+    setTotalTimeSpent(0);
+    setPoints(0);
+    setSelectedOption(null);
+    setIsAnswered(false);
+    setTimePerQuestion(0);
+    cancelAutoNext();
   };
 
   // 2. Xử lý phím tắt bàn phím
@@ -834,24 +846,24 @@ const Quiz = ({ params }) => {
     let selectedQuestions = [];
     if (practiceMode === "wrong") {
       // 1. Chế độ ôn tập câu hay sai:
-      // Lọc ra các câu hỏi trong ngân hàng mà học viên này từng trả lời sai (wrong_count > 0)
+      // Lọc ra các câu hỏi trong ngân hàng mà học viên này từng trả lời sai (countCorrect < 0)
       const wrongQuestions = rawQuestions.filter(q => {
-        const wrongCount = (questionStatsMap[q.id] || questionStatsMap[q.question])?.wrong_count || 0;
-        return wrongCount > 0;
+        const countCorrect = (questionStatsMap[q.id] || questionStatsMap[q.question])?.countCorrect || 0;
+        return countCorrect < 0;
       });
       
       // Gán trọng số ngẫu nhiên cố định để đảm bảo phép sắp xếp trong Javascript luôn nhất quán và ổn định
       const wrongWithRandom = wrongQuestions.map(q => ({
         q,
-        wrong: (questionStatsMap[q.id] || questionStatsMap[q.question])?.wrong_count || 0,
+        correct: (questionStatsMap[q.id] || questionStatsMap[q.question])?.countCorrect || 0,
         rand: Math.random()
       }));
 
-      // Sắp xếp theo số lần làm sai giảm dần (câu sai nhiều nhất lên trước)
+      // Sắp xếp theo mức độ sai (countCorrect càng âm thì càng lên trước)
       // Nếu bằng nhau, áp dụng xáo trộn ngẫu nhiên ổn định qua trọng số rand
       wrongWithRandom.sort((a, b) => {
-        if (b.wrong !== a.wrong) {
-          return b.wrong - a.wrong;
+        if (a.correct !== b.correct) {
+          return a.correct - b.correct; // Âm nhiều hơn sẽ nhỏ hơn, nên xếp lên trước
         }
         return a.rand - b.rand;
       });
@@ -864,21 +876,26 @@ const Quiz = ({ params }) => {
       // Gán trọng số ngẫu nhiên cố định để đảm bảo phép sắp xếp luôn nhất quán và ổn định
       const rawWithRandom = rawQuestions.map(q => ({
         q,
-        appears: (questionStatsMap[q.id] || questionStatsMap[q.question])?.appears_count || 0,
+        meet: (questionStatsMap[q.id] || questionStatsMap[q.question])?.countMeet || 0,
         rand: Math.random()
       }));
 
-      // Sắp xếp câu hỏi theo số lần xuất hiện (appears_count) tăng dần (0 là chưa gặp, 1 là đã gặp)
-      // Các câu hỏi chưa gặp (appears = 0) luôn được xếp lên trước các câu hỏi đã gặp (appears = 1)
+      // Sắp xếp câu hỏi theo số lần xuất hiện (countMeet) tăng dần
+      // Các câu hỏi chưa gặp (meet = 0) luôn được xếp lên trước các câu hỏi đã gặp (meet >= 1)
       // Nếu số lần xuất hiện bằng nhau, xáo trộn ngẫu nhiên ổn định qua trọng số rand
       rawWithRandom.sort((a, b) => {
-        if (a.appears !== b.appears) {
-          return a.appears - b.appears;
+        if (a.meet !== b.meet) {
+          return a.meet - b.meet;
         }
         return a.rand - b.rand;
       });
       
       selectedQuestions = rawWithRandom.slice(0, selectedQuestionCount).map(item => item.q);
+    }
+
+    if (selectedQuestions.length === 0) {
+      alert("Không có câu hỏi nào thỏa mãn để ôn tập. Vui lòng chọn chế độ khác.");
+      return;
     }
 
     // Xáo trộn ngẫu nhiên thứ tự các đáp án cho từng câu hỏi được chọn để tránh học vẹt
@@ -903,8 +920,14 @@ const Quiz = ({ params }) => {
   };
 
   // --- TÍNH TOÁN CÁC BIẾN PHỤ TRỢ THỐNG KÊ (ĐẶT SAU TẤT CẢ CÁC HOOKS) ---
-  const wrongQuestionsList = rawQuestions.filter(q => ((questionStatsMap[q.id] || questionStatsMap[q.question])?.wrong_count || 0) > 0);
-  const answeredQuestionsCount = rawQuestions.filter(q => ((questionStatsMap[q.id] || questionStatsMap[q.question])?.appears_count || 0) > 0).length;
+  const wrongQuestionsList = rawQuestions.filter(q => {
+    const countCorrect = (questionStatsMap[q.id] || questionStatsMap[q.question])?.countCorrect || 0;
+    return countCorrect < 0;
+  });
+  const answeredQuestionsCount = rawQuestions.filter(q => {
+    const countMeet = (questionStatsMap[q.id] || questionStatsMap[q.question])?.countMeet || 0;
+    return countMeet > 0;
+  }).length;
 
   // Hàm chuyển đổi chế độ làm bài và điều chỉnh slider tương ứng tránh vượt quá giới hạn
   const handleModeChange = (mode) => {
@@ -1185,7 +1208,7 @@ const Quiz = ({ params }) => {
             />
           </div>
 
-          {editingQuestion?.id === questions[currentQuestionIndex]?.id ? (
+          {editingQuestion && editingQuestion.id === questions[currentQuestionIndex]?.id ? (
             // KHỐI GIAO DIỆN CHỈNH SỬA CÂU HỎI TRỰC TIẾP CỦA ADMIN (Inline Edit)
             <div className="bg-white p-6 rounded-2xl shadow border border-blue-200 mb-6 relative z-10">
               <h3 className="font-bold text-lg mb-4 text-blue-800 flex items-center gap-2">

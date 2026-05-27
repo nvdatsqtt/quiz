@@ -11,7 +11,7 @@ export async function GET(request) {
       });
     }
 
-    const res = await client.execute(`SELECT id, subject_id, question, hint_text, hint_status, hint_pending_text, hint_updated_by FROM questions WHERE hint_status = 'pending' OR hint_status = 'auto_accepted'`);
+    const res = await client.execute(`SELECT id, subject_id, question, options, hint_text, hint_status, hint_pending_text, hint_updated_by FROM questions WHERE hint_status = 'pending' OR hint_status = 'auto_accepted'`);
 
     return new Response(JSON.stringify({ pendingHints: res.rows }), { 
       status: 200, headers: { "Content-Type": "application/json" } 
