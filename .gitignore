@@ -42,3 +42,4 @@ docs
 .env*
 .agents
 .commandcode
+venv

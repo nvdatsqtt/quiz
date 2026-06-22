@@ -88,8 +88,16 @@ async function importData() {
       for (const q of subjectData.questions) {
         const qId = crypto.randomUUID();
         await client.execute({
-          sql: `INSERT INTO questions (id, subject_id, question, options, answer) VALUES (?, ?, ?, ?, ?)`,
-          args: [qId, subjectId, q.question, JSON.stringify(q.options), q.answer]
+          sql: `INSERT INTO questions (id, subject_id, question, options, answer, hint_text, hint_status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            qId, 
+            subjectId, 
+            q.question, 
+            JSON.stringify(q.options), 
+            q.answer,
+            q.hint ? JSON.stringify(q.hint) : null,
+            q.hint_status || null
+          ]
         });
         inserted++;
       }
